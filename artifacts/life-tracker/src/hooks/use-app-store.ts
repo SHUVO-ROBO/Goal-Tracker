@@ -72,8 +72,8 @@ export const INITIAL_PIPELINE: PipelineStage[] = [
   { id: 3, title: "Classical Machine Learning Algorithms", status: "not_started" },
   { id: 4, title: "Deep Learning (PyTorch / TensorFlow)", status: "not_started" },
   { id: 5, title: "Bangla NLP & Transformers (Hugging Face)", status: "not_started" },
-  { id: 6, title: "LLM Architectures & RAG", status: "not_started" },
-  { id: 7, title: "MLOps, Model Deployment & Production Infrastructure", status: "not_started" },
+  { id: 6, title: "LLM Architectures, RAG & Retrieval Pipelines", status: "not_started" },
+  { id: 7, title: "MLOps, Model Deployment & AI Infrastructure Engineering", status: "not_started" },
 ];
 
 export type HCIPaperStage = "Literature Review" | "Data Collection" | "Experimentation" | "Paper Drafting" | "Conference Submission";
@@ -87,6 +87,78 @@ export const INITIAL_HCI: HCITracker = {
   notes: "",
   papersPublished: 0,
 };
+
+// ── Certificate / Course Tracker ────────────────────────────────────────────
+export type CertProvider = "IBM" | "Coursera" | "Microsoft" | "Google" | "Other";
+
+export type Certificate = {
+  id: string;
+  title: string;
+  provider: CertProvider;
+  platform: string;      // e.g. "Coursera", "edX", "LinkedIn Learning"
+  category: string;      // e.g. "AI/ML", "Cloud", "DevOps"
+  status: "Not Started" | "In Progress" | "Completed";
+  completionDate: string;   // ISO date or ""
+  certificateUrl: string;   // link to certificate or ""
+  credentialId: string;     // badge/credential ID or ""
+  notes: string;
+};
+
+export const INITIAL_CERTIFICATES: Certificate[] = [
+  // IBM
+  {
+    id: "c1", title: "IBM AI Developer Professional Certificate", provider: "IBM",
+    platform: "Coursera", category: "AI/ML", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "12-course series. Priority path.",
+  },
+  {
+    id: "c2", title: "IBM Machine Learning Professional Certificate", provider: "IBM",
+    platform: "Coursera", category: "AI/ML", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Covers ML + Scikit-learn + IBM Watson.",
+  },
+  {
+    id: "c3", title: "IBM Applied AI with Deep Learning", provider: "IBM",
+    platform: "Coursera", category: "Deep Learning", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Keras, PyTorch, TensorFlow.",
+  },
+  // Coursera / DeepLearning.AI
+  {
+    id: "c4", title: "Deep Learning Specialization", provider: "Coursera",
+    platform: "Coursera (DeepLearning.AI)", category: "Deep Learning", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Andrew Ng. 5 courses. Core DL foundations.",
+  },
+  {
+    id: "c5", title: "Machine Learning Specialization", provider: "Coursera",
+    platform: "Coursera (DeepLearning.AI)", category: "AI/ML", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Andrew Ng. 3 courses. Updated 2023.",
+  },
+  {
+    id: "c6", title: "MLOps Specialization", provider: "Coursera",
+    platform: "Coursera (DeepLearning.AI)", category: "MLOps", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "4-course series. CI/CD for ML.",
+  },
+  {
+    id: "c7", title: "NLP Specialization", provider: "Coursera",
+    platform: "Coursera (DeepLearning.AI)", category: "NLP", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "4 courses. Transformers, attention, RAG.",
+  },
+  // Microsoft
+  {
+    id: "c8", title: "Azure AI Engineer Associate (AI-102)", provider: "Microsoft",
+    platform: "Microsoft Learn", category: "Cloud AI", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Official MS certification. Highly valued.",
+  },
+  {
+    id: "c9", title: "Azure Data Scientist Associate (DP-100)", provider: "Microsoft",
+    platform: "Microsoft Learn", category: "Cloud AI", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "Azure ML Studio + Pipelines.",
+  },
+  {
+    id: "c10", title: "GitHub Copilot Fundamentals", provider: "Microsoft",
+    platform: "Microsoft Learn", category: "DevOps", status: "Not Started",
+    completionDate: "", certificateUrl: "", credentialId: "", notes: "AI-assisted coding. Quick win.",
+  },
+];
 
 export type DistractionLog = {
   academics: number;
@@ -135,18 +207,22 @@ export type Scholarship = {
   deadline: string;
   status: "Researching" | "Applying" | "Applied" | "Result";
   metRequirements: boolean;
+  notes?: string;
 };
 
+// Deadlines updated for 2029 intake (applications typically open ~1 year prior)
 export const INITIAL_SCHOLARSHIPS: Scholarship[] = [
-  { id: "1", name: "Fulbright", country: "US", deadline: "2024-10-15", status: "Researching", metRequirements: false },
-  { id: "2", name: "Chevening", country: "UK", deadline: "2024-11-01", status: "Researching", metRequirements: false },
-  { id: "3", name: "DAAD", country: "Germany", deadline: "2024-10-31", status: "Researching", metRequirements: false },
-  { id: "4", name: "Erasmus Mundus", country: "EU", deadline: "2025-01-15", status: "Researching", metRequirements: false },
-  { id: "5", name: "Gates Cambridge", country: "UK", deadline: "2024-12-01", status: "Researching", metRequirements: false },
-  { id: "6", name: "Stipendium Hungaricum", country: "Hungary", deadline: "2025-01-15", status: "Researching", metRequirements: false },
-  { id: "7", name: "Swedish Institute", country: "Sweden", deadline: "2025-02-20", status: "Researching", metRequirements: false },
-  { id: "8", name: "ETH Zurich Excellence", country: "Switzerland", deadline: "2024-12-15", status: "Researching", metRequirements: false },
-  { id: "9", name: "NUS Research Scholarship", country: "Singapore", deadline: "2024-11-15", status: "Researching", metRequirements: false },
+  { id: "1", name: "Fulbright Foreign Student", country: "🇺🇸 USA", deadline: "2028-10-15", status: "Researching", metRequirements: false, notes: "Fully funded. GRE optional. CGPA 3.7+ preferred." },
+  { id: "2", name: "Chevening", country: "🇬🇧 UK", deadline: "2028-11-04", status: "Researching", metRequirements: false, notes: "Leadership-focused. Strong LORs needed." },
+  { id: "3", name: "DAAD Research Grants", country: "🇩🇪 Germany", deadline: "2028-10-31", status: "Researching", metRequirements: false, notes: "Research-aligned. German prof contact helps." },
+  { id: "4", name: "Erasmus Mundus Joint Master", country: "🇪🇺 EU", deadline: "2029-01-15", status: "Researching", metRequirements: false, notes: "Study in 2+ EU countries. Strong CS/AI programs." },
+  { id: "5", name: "Erasmus+ (Study Abroad)", country: "🇪🇺 EU", deadline: "2028-03-31", status: "Researching", metRequirements: false, notes: "Requires UIU bilateral agreement. Check with Int'l Office." },
+  { id: "6", name: "Gates Cambridge", country: "🇬🇧 UK", deadline: "2028-12-01", status: "Researching", metRequirements: false, notes: "Cambridge admission + Gates review. Very competitive." },
+  { id: "7", name: "Stipendium Hungaricum", country: "🇭🇺 Hungary", deadline: "2029-01-15", status: "Researching", metRequirements: false, notes: "Apply via Bangladesh MoFA. Full scholarship." },
+  { id: "8", name: "Swedish Institute Scholarships", country: "🇸🇪 Sweden", deadline: "2029-02-14", status: "Researching", metRequirements: false, notes: "Leadership + sustainability focus." },
+  { id: "9", name: "ETH Zurich Excellence Scholarship", country: "🇨🇭 Switzerland", deadline: "2028-12-01", status: "Researching", metRequirements: false, notes: "ETH direct admission required first. Top-tier AI." },
+  { id: "10", name: "NUS Research Scholarship", country: "🇸🇬 Singapore", deadline: "2028-11-15", status: "Researching", metRequirements: false, notes: "Strong AI/ML dept. Monthly stipend SGD 2,700." },
+  { id: "11", name: "Korean Government Scholarship (KGSP)", country: "🇰🇷 South Korea", deadline: "2028-09-30", status: "Researching", metRequirements: false, notes: "Full fund. KAIST, POSTECH options. AI research fit." },
 ];
 
 export type Internship = {
@@ -162,7 +238,7 @@ export const INITIAL_INTERNSHIPS: Internship[] = [
   { id: "2", name: "Google Developer Group (GDG)", deadline: "TBA", status: "Not Applied", notes: "" },
   { id: "3", name: "IBM Community Student Lead", deadline: "TBA", status: "Not Applied", notes: "" },
   { id: "4", name: "Coursera Campus Partner", deadline: "TBA", status: "Not Applied", notes: "" },
-  { id: "5", name: "NASA Internship", deadline: "2024-11-01", status: "Not Applied", notes: "" },
+  { id: "5", name: "NASA Internship", deadline: "2028-11-01", status: "Not Applied", notes: "" },
 ];
 
 export type DailyQuranRecord = {
@@ -189,6 +265,7 @@ export function useAppStore() {
   const [documents, setDocuments] = useLocalStorage<DocumentChecklist[]>("life_tracker_documents", INITIAL_DOCUMENTS);
   const [scholarships, setScholarships] = useLocalStorage<Scholarship[]>("life_tracker_scholarships", INITIAL_SCHOLARSHIPS);
   const [internships, setInternships] = useLocalStorage<Internship[]>("life_tracker_internships", INITIAL_INTERNSHIPS);
+  const [certificates, setCertificates] = useLocalStorage<Certificate[]>("life_tracker_certificates", INITIAL_CERTIFICATES);
   
   const [vocab, setVocab] = useLocalStorage<{word: string, date: string}[]>("life_tracker_vocab", []);
   const [mockTests, setMockTests] = useLocalStorage<{date: string, listening: number, reading: number, writing: number, speaking: number, overall: number}[]>("life_tracker_mock_tests", []);
@@ -205,6 +282,7 @@ export function useAppStore() {
     documents, setDocuments,
     scholarships, setScholarships,
     internships, setInternships,
+    certificates, setCertificates,
     vocab, setVocab,
     mockTests, setMockTests,
     cambridgeTests, setCambridgeTests,
