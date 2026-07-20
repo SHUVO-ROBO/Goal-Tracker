@@ -1,0 +1,68 @@
+Act as a Senior Full-Stack Developer and UI/UX Expert. Build a highly professional, aesthetic, and motivational Personal Life-Tracker Dashboard (Web Application) tailored for a CSE Undergraduate Student aiming for absolute excellence in Dunya and Akhirah. 
+
+The website must be clean, dark-themed (with subtle neon green/blue accents for high focus), minimal, and completely free of clutter to eliminate dopamine distraction. It should follow a strict modular components design.
+
+Here are the detailed specifications for the components and sections of the dashboard:
+
+1. NORTH STAR HEADER (The Core Philosophy)
+- Display a prominent quote section at the top: "The journey to becoming an AI Engineer isn't about learning everything overnight—it's about mastering one step at a time."
+- Add a counter showing: "Trimesters Remaining: 7 | Months Remaining: ~26".
+
+2. THE "WHY" & MISSION-VISION ARCHITECTURE (Collapsible/Sticky Sidebar)
+- Vision Statement: To build scalable AI systems focused on MLOps, Bangla NLP, and production-grade Islamic HCI research for Muslims worldwide.
+- The 5-Layer "WHY" Engine (Root Cause Motivation):
+  * Why 1: Why scale AI for the country? To solve real-world socioeconomic problems of Bangladesh.
+  * Why 2: Why maintain a 3.99+ CGPA? To become a University Lecturer and secure top-tier recommendations.
+  * Why 3: Why target a full-funded Global Scholarship? To eliminate the 30 Lakh BDT family debt without financial stress.
+  * Why 4: Why build 3-4 Research Publications? To unlock gates to MIT, Stanford, ETH Zurich, or NUS.
+  * Why 5: Why master the Quran & Languages? To protect Dunya & Akhirah and build the Quran-based LLM infrastructure.
+- Mission Statement: Graduate with a 3.99+ CGPA, publish at least 3-4 high-impact AI/ML papers, clear IELTS (Target 7.5+), and secure a full-funded Master’s/PhD in Europe/USA.
+
+3. ACADEMIC & RESULT TRACKER (Current Focus: Trimester 262)
+- A dynamic grade calculator and tracker initialized with 51 completed credits.
+- Must display current running courses for Trimester 262:
+  * CSE 3521: Database Management Systems (DBMS) [Target: A / 4.00]
+  * CSE 3313: Computer Architecture [Target: A / 4.00]
+  * EEE 2123 & EEE 2124: Electronics & Lab [Target: A / 4.00]
+- A review checklist submodule for "Self-Study/Revision of Fundamentals" (DSA, SPL, and Mathematics) scheduled strictly for weekends (4 hours total).
+
+4. THE STEP-BY-STEP AI/ML & RESEARCH PIPELINE
+- Implement a progressive roadmap tracker based on these strict sequential stages:
+  1. Python & Math Fundamentals (Stats, Linear Algebra)
+  2. SQL, Databases & Data Preprocessing (DBMS Alignment)
+  3. Classical Machine Learning Algorithms
+  4. Deep Learning (PyTorch/TensorFlow)
+  5. Bangla NLP & Transformers (Hugging Face)
+  6. LLM Architectures & RAG (Retrieval-Augmented Generation)
+  7. MLOps, Model Deployment & Production Infrastructure
+- Research Hub: A micro-tracker for "Islamic HCI & Bangla NLP Research". Include stages: Literature Review ➔ Data Collection (Quranic Corpus) ➔ Experimentation ➔ Paper Drafting ➔ Conference Submission. Target: 3-4 Papers.
+
+5. TIME MANAGEMENT & THE "ANTI-DISTRACTION" FIREWALL
+- 24-Hour Locked Time-Blocking Widget (Strictly visualizes the day, preventing multitasking):
+  * 04:30 AM - 06:30 AM: Spiritual & Vision Start (Quran Tafsir & Day Planning).
+  * 06:30 AM - 08:30 AM: Deep Work (AI/ML Engineering & Code Push to GitHub).
+  * 09:00 AM - 04:00 PM: Academic Core (UIU Classes, Labs, Faculty Networking).
+  * 04:30 PM - 06:30 PM: High-Paying Skill/Active Earning.
+  * 07:30 PM - 09:30 PM: Academic Review & Assignments.
+  * 09:30 PM - 10:30 PM: Isolated Buffer Time (Dedicated slot for worrying about Family Problems/Debt. Strictly banned during other hours).
+- Distraction Highlight Board (Red Zone Flashing Alerts): A static, un-dismissible widget listing:
+  ❌ Visionless People & Aimless Conversations
+  ❌ Dopamine Traps (Facebook Reels, YouTube Music, Movies)
+  ❌ Emotional Distractions / Relationship Traps
+  ❌ Laziness & Procrastination
+
+6. EUROPE/USA MASTER’S PREPARATION & DOCUMENT CHECKLIST
+- A multi-tab progress checklist for Document Readiness:
+  * [ ] Passport & NID Name Correction (Verify spelling alignment across SSC/HSC certificates and Parents' NIDs).
+  * [ ] Academic Transcripts (Official compilation from Registrar office).
+  * [ ] IELTS/GRE Pre-Prep Status (Daily 5 words from Magoosh/Gregmat, Cambridge Listening tests).
+  * [ ] SOP (Statement of Purpose) Master Draft.
+  * [ ] LOR (Letter of Recommendation) Matrix: Track 3 target professors for networking.
+  * [ ] Global Internship/ECA Sub-tracker: Applications tracker for FAANG (Google, Microsoft Student Ambassadors, IBM Leads) to build leadership and public speaking.
+
+7. SPIRITUAL CORE INTEGRATION (Quran & Life)
+- A daily checking log: "Did I implement the Quranic principles today?"
+- A field to add 1 Verse (Ayah) with meaning daily, connecting its context to human psychology or Islamic HCI application design.
+
+TECHNICAL STACK PREFERENCE: 
+Use Next.js or React with Tailwind CSS for layout. Ensure all charts and progress bars are interactive, local-storage stateful (so data stays updated on refresh), responsive, and optimized for smooth, latency-free rendering. Give me the complete modular structure and code clean, organized, and production-ready.
