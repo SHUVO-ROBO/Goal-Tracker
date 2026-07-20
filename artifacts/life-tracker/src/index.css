@@ -72,30 +72,30 @@
   --elevate-1: rgba(212, 175, 55, 0.04);
   --elevate-2: rgba(212, 175, 55, 0.09);
 
-  /* Deep navy-black background — richer than pure black, Islamic night sky */
-  --background: 222 28% 7%;
+  /* Rich midnight navy — deep but clearly blue-tinted, not black */
+  --background: 224 35% 10%;
   --foreground: 43 15% 95%;
 
-  --card: 222 24% 11%;
+  --card: 224 30% 14%;
   --card-foreground: 43 10% 93%;
-  --card-border: 222 20% 18%;
+  --card-border: 224 25% 21%;
 
-  --popover: 222 24% 11%;
+  --popover: 224 30% 14%;
   --popover-foreground: 43 10% 93%;
-  --popover-border: 222 20% 18%;
+  --popover-border: 224 25% 21%;
 
-  /* Sidebar — deepest navy */
-  --sidebar: 222 30% 6%;
+  /* Sidebar — slightly deeper than background */
+  --sidebar: 225 38% 8%;
   --sidebar-foreground: 43 10% 85%;
-  --sidebar-border: 222 20% 14%;
+  --sidebar-border: 224 25% 17%;
   --sidebar-primary: 43 74% 58%;
-  --sidebar-primary-foreground: 222 30% 8%;
-  --sidebar-accent: 222 20% 14%;
+  --sidebar-primary-foreground: 224 35% 8%;
+  --sidebar-accent: 224 28% 16%;
   --sidebar-accent-foreground: 43 10% 92%;
   --sidebar-ring: 43 74% 58%;
 
-  --border: 222 18% 18%;
-  --input: 222 18% 16%;
+  --border: 224 22% 22%;
+  --input: 224 22% 19%;
   --ring: 43 74% 58%;
 
   /* Gold — Islamic primary */
