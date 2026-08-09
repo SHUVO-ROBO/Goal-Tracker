@@ -1,0 +1,1 @@
+- [Cross-device sync](cross-device-sync.md) — GitHub Pages/localStorage cannot sync data between devices; secure login plus cloud storage is required.
