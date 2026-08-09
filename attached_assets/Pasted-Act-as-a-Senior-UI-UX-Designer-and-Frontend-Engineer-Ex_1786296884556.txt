@@ -1,0 +1,41 @@
+Act as a Senior UI/UX Designer and Frontend Engineer. Extend the previous "Muslim's Day" style Personal Dashboard React/Next.js code by adding a high-utility, Google Calendar-inspired "Academic & Event Matrix" at the VERY TOP of the dashboard.
+
+VISUAL DESIGN & COLOR CODING (Muslim's Day Theme):
+- Use a clean Glassmorphism dark grid with custom accent colors for high-priority visual distinction:
+  * 🔴 Crimson Red Badge: Final Exams & Critical High-Priority Tasks
+  * 🟠 Warm Amber/Orange Badge: Midterm Exams
+  * 🟡 Soft Golden-Yellow Badge: Class Tests (CT 1, CT 2, CT 3, CT 4)
+  * 🟢 Mint Green Badge: Important Life Tasks / Personal Deadlines (Non-exam events)
+  * 🔵 Royal Blue Badge: Assignment / Lab Report Submissions
+
+NEW MODULE: GOOGLE CALENDAR-STYLE ACADEMIC & TASK MATRIX (Positioned at the Top)
+
+1. INTERACTIVE MONTHLY/WEEKLY CALENDAR ENGINE
+- A clean, grid-based calendar view at the top of the dashboard.
+- Features: Month navigation (Prev/Next), date grid, and clickable date cells.
+- Dynamic Day Highlight: The current day must glow with a subtle Gold (#C5A850) border.
+- Event Dots: Any date with an exam or task displays small color-coded dots (Red/Orange/Yellow/Green) indicating upcoming obligations.
+
+2. EXAM & TOPIC TRACKER (Multi-Insight Modal / Drawers)
+- When clicking on any Date or clicking the "+ Add Event/Exam" button, open an intuitive Modal form with the following input fields:
+  * Event Category: [Class Test (CT) / Midterm / Final Exam / Assignment / Important Task]
+  * Subject Name: (e.g., CSE 3521: DBMS, CSE 3313: Computer Architecture, EEE 2123)
+  * Exam/Task Title: (e.g., "CT 2 on Indexing & B-Trees", "Midterm Exam", "Passport NID Application submission")
+  * Date & Time Picker.
+  * Priority Level: [High 🔴 / Medium 🟠 / Normal 🟢]
+  * Syllabus / To-Do Breakdown: An interactive checklist input where Shuvo can list specific exam topics (e.g., "[ ] ER Diagram", "[ ] Relational Algebra", "[ ] Normalization 3NF").
+
+3. DYNAMIC "UPCOMING EXAMS & DEADLINES" PRIORITY FEED
+- Located right next to or below the calendar view, render an auto-sorted "Priority Feed":
+  * Sort Rule: Strictly sort events by closest date first (e.g., an exam tomorrow appears at the top in Red/Orange, while an exam next month is further down).
+  * Feature: Show a dynamic countdown pill for each item (e.g., "In 2 Days", "Tomorrow", "Today!").
+  * Topic To-Do Sub-List: Inside each exam card, show a collapsible checklist of the exam topics. Checking off a topic updates the progress bar (e.g., "Syllabus Covered: 3/5 Topics - 60%").
+  * Multi-Event Handling: If multiple exams or tasks fall on the SAME DAY (e.g., CT 3 + Assignment), display them stacked neatly inside the day slot with clear distinct badges.
+
+4. EDIT, UPDATE & LOCAL STORAGE PERSISTENCE
+- Allow full CRUD (Create, Read, Update, Delete) capabilities for all exams and tasks.
+- Ensure all added exams, checked topics, and calendar entries persist strictly in browser `localStorage`.
+
+TECHNICAL STACK & INSTRUCTIONS:
+- Implement using React / Next.js with Tailwind CSS and Lucide Icons.
+- Ensure the interface remains completely responsive, ultra-clean, dark-themed (Muslim's Day aesthetic), and completely lag-free. Return the complete production-ready code.

@@ -1,0 +1,86 @@
+You are an expert Full-Stack Web Developer. I am building this personalized Academic & Career Tracker using Replit AI, but it is hosted/deployed on GitHub Pages at: https://shuvo-robo.github.io/Goal-Tracker/
+
+Please upgrade the application, fix the routing bugs caused by GitHub Pages hosting, and implement all the requested dynamic features. Ensure everything works seamlessly in real-time.
+
+---
+
+### SECTION 1: GITHUB PAGES HOUSING & ROUTING FIXES (CRITICAL)
+
+1. **GitHub Pages 404 Refresh Bug:**
+   - **Problem:** When the site is live on GitHub Pages, refreshing the page displays a "404 File Not Found" error. However, clicking internal UI links works perfectly.
+   - **Fix for GitHub Pages:** Change the routing strategy to `HashRouter` (instead of `BrowserRouter`) inside the React project so URLs look like `#/dashboard`. Alternatively, implement the standard GitHub Pages SPA hack: create a custom `404.html` in the public directory that captures the broken path, saves it to `sessionStorage`, redirects to `index.html`, and lets the router pick it up without breaking. Ensure the `base` path matches `/Goal-Tracker/`.
+
+2. **Dashboard Sync & Input Management:**
+   - **Problem:** Completed credits and "Done" status do not update on the main dashboard in real-time. The user accidentally updated the credits to 262 but cannot delete or undo it.
+   - **Fix:** Enable manual editing/overriding for completed credits. Add an **Undo/Reset** functionality for the trimester and credit fields so the user can easily revert mistakes.
+   - Add a functional **Remove/Delete** button next to uploaded courses to clear them instantly from the state.
+
+3. **Real-Time Global State:**
+   - Implement global state management (React Context or Zustand) synchronized with LocalStorage so that *any* change made anywhere in the app updates the metrics, percentages, and progress bars across the entire site instantly in real-time.
+
+---
+
+### SECTION 2: ACADEMIC POLICIES & PORTFOLIO INTEGRATION
+
+1. **UIU CGPA Calculator Integration:**
+   - Implement the official UIU Grading Policy for the CGPA calculator using this exact logic:
+     * A  (4.00): 90 – 100 | A- (3.67): 86 – 89
+     * B+ (3.33): 82 – 85  | B  (3.00): 78 – 81 | B- (2.67): 74 – 77
+     * C+ (2.33): 70 – 73  | C  (2.00): 66 – 69 | C- (1.67): 62 – 65
+     * D+ (1.33): 58 – 61  | D  (1.00): 55 – 57
+     * F  (0.00): 00 – 54
+
+2. **Portfolio Link & Copy Update:**
+   - Link the external portfolio globally: `https://shuvo-robo.github.io/portfolio/`
+   - **Text Removal:** Remove the text "Bangla NLP" from the **Vision** section completely.
+
+---
+
+### SECTION 3: NEW MAIN DASHBOARD & REAL-TIME SUMMARY CONTROLLER
+
+Create a **Unified, Colorful, and Decent Dashboard** as the home screen containing:
+
+1. **24-Hour Activity Daily Summary Log (Colorful Grid):**
+   - Automatically pull and summarize everything the user has done today across all 6 segments (Academic, MS Abroad, Financial Crisis, etc.) into one visual timeline or list tracker.
+   
+2. **Daily Action Center:**
+   - **To-Do List:** An interactive daily planner/checklist.
+   - **Focus Timer:** An aesthetic, colorful countdown/stopwatch visual timer to track study sessions.
+
+3. **Real-Time Core Profile Summary:**
+   - Display: Completed Credits, Course List, Skills, and a dynamic **ECA (Extra-Curricular Activities) Section** (where the user can dynamically add achievements like "UGA - Undergraduate Assistant", internships, or club roles).
+   - **Countdown Timer:** "Days off graduation" counter updating perfectly in real-time.
+
+4. **Progress Completion Tracker:**
+   - Beautiful, color-coded circular progress rings or bars showing the completion percentage of *each* of the 6 core modules based on completed tasks/documents.
+
+---
+
+### SECTION 4: MODULE ADVANCEMENTS & STORAGE HUBS
+
+1. **Dynamic Research Hub:**
+   - Make the Research Hub completely flexible. The user must be able to add new custom topics (e.g., "Islamic HCI", "Human-Computer Interaction") and save papers, notes, and milestones under those specific categories.
+
+2. **Idea, Project, & Document Vault:**
+   - A dedicated secure vault to save personal project ideas, research insights, and upload digital assets (mock base64 or localStorage integration for PDFs, Certificates, and Word Docs) mapped to relevant segments.
+
+3. **Academic Course Vault (Lecture Notes Archive):**
+   - A specific repository inside the academic section to save comprehensive study notes and resources for *every single completed course* so the user can easily revise them later to become a university lecturer.
+
+4. **Scholarship Tracker Upgrade:**
+   - Create a dynamic CRUD list interface where the user can manually add, edit, or delete prospective scholarships with fields for **Name, Application Deadline, and Requirements/Time**.
+
+5. **Daily Vocabulary & Reflection Log:**
+   - **Vocabulary Log:** An editable log restricted to exactly *one edit entry per day* to build a continuous learning habit.
+   - **Ayah & Reflection Archive:** Ensure inputs written in "Today's Ayah and Reflection" are automatically saved into a permanent history list rather than disappearing.
+
+6. **MS Financial Crisis Plan Tracker:**
+   - A specialized timeline within the MS section focused on bridging the transition in "Year 3" for managing personal financial crisis while systematically preparing profiles for fully funded MS programs abroad.
+
+---
+
+### DESIGN & UX DIRECTIONS
+- Use high-contrast, clean, yet vibrant color coding for different segments (e.g., Academic = Emerald, MS Abroad = Indigo, Daily Tasks = Amber).
+- Ensure smooth CSS transitions and layout responsive states.
+- Prioritize optimistic UI updates so that whenever the user toggles a checkbox, alters credits, or logs an entry, it reflects instantly without jank.
+-
