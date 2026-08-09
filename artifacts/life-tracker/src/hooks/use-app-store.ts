@@ -9,6 +9,14 @@ export type Course = {
   gpa: number;
   semester: string;
   status: "completed" | "running";
+  assessments?: AssessmentItem[];
+};
+
+export type AssessmentItem = {
+  id: string;
+  label: string;
+  maxMarks: number;
+  obtainedMarks: number;
 };
 
 export const INITIAL_COURSES: Course[] = [
@@ -41,6 +49,15 @@ export const INITIAL_COURSES: Course[] = [
 ];
 
 export const INITIAL_CURRENT_TRIMESTER = "262";
+
+export const DEFAULT_ASSESSMENTS: AssessmentItem[] = [
+  { id: "ct-1", label: "CT 1", maxMarks: 20, obtainedMarks: 0 },
+  { id: "ct-2", label: "CT 2", maxMarks: 20, obtainedMarks: 0 },
+  { id: "mid", label: "Midterm", maxMarks: 30, obtainedMarks: 0 },
+  { id: "final", label: "Final", maxMarks: 40, obtainedMarks: 0 },
+  { id: "attendance", label: "Attendance", maxMarks: 5, obtainedMarks: 0 },
+  { id: "assignment", label: "Assignment", maxMarks: 5, obtainedMarks: 0 },
+];
 
 export type SelfReview = {
   id: string; task: string; duration: string; completed: boolean; notes: string;

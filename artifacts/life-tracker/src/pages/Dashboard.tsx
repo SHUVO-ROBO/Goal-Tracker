@@ -83,7 +83,7 @@ export function Dashboard() {
             <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
               <div className="text-[10px] uppercase text-muted-foreground font-mono mb-2 tracking-widest">🎯 Vision</div>
               <p className="font-amiri text-lg md:text-xl text-foreground/95 leading-relaxed">
-                "Building scalable AI systems focused on MLOps, Bangla NLP, and production-grade machine learning.
+                "Building scalable AI systems focused on MLOps and production-grade machine learning.
                 Focused on LLM systems, retrieval pipelines, and AI infrastructure engineering."
               </p>
             </div>

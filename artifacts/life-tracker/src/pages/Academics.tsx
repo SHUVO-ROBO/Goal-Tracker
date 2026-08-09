@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useAppStore, NoteLink, NoteLinkCategory, NOTE_CATEGORY_COLORS } from "@/hooks/use-app-store";
+import {
+  useAppStore, NoteLink, NoteLinkCategory, NOTE_CATEGORY_COLORS,
+  AssessmentItem, Course, DEFAULT_ASSESSMENTS,
+} from "@/hooks/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,8 +20,33 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveCont
 
 const GRADE_POINTS: Record<string, number> = {
   "A": 4.00, "A-": 3.67, "B+": 3.33, "B": 3.00,
-  "B-": 2.67, "C+": 2.33, "C": 2.00, "D": 1.00, "F": 0.00,
+  "B-": 2.67, "C+": 2.33, "C": 2.00, "C-": 1.67,
+  "D+": 1.33, "D": 1.00, "F": 0.00,
 };
+
+const GRADE_RANGES: { min: number; grade: string; gpa: number }[] = [
+  { min: 90, grade: "A", gpa: 4.00 },
+  { min: 86, grade: "A-", gpa: 3.67 },
+  { min: 82, grade: "B+", gpa: 3.33 },
+  { min: 78, grade: "B", gpa: 3.00 },
+  { min: 74, grade: "B-", gpa: 2.67 },
+  { min: 70, grade: "C+", gpa: 2.33 },
+  { min: 66, grade: "C", gpa: 2.00 },
+  { min: 62, grade: "C-", gpa: 1.67 },
+  { min: 58, grade: "D+", gpa: 1.33 },
+  { min: 55, grade: "D", gpa: 1.00 },
+  { min: 0, grade: "F", gpa: 0.00 },
+];
+
+function gradeFromPercent(percent: number) {
+  return GRADE_RANGES.find(range => percent >= range.min) ?? GRADE_RANGES[GRADE_RANGES.length - 1];
+}
+
+function assessmentsFor(course: Course): AssessmentItem[] {
+  return course.assessments?.length
+    ? course.assessments
+    : DEFAULT_ASSESSMENTS.map(item => ({ ...item }));
+}
 
 const NOTE_CATEGORIES: NoteLinkCategory[] = [
   "Lecture Notes", "Assignment", "Reference", "Lab", "Project", "Tutorial", "Other",
@@ -84,6 +112,86 @@ function AddCourseRow({ trimester, onAdd }: { trimester: string; onAdd: (c: any)
       <Button size="sm" variant="ghost" className="h-8 text-muted-foreground" onClick={() => setOpen(false)}>
         <X className="size-3" />
       </Button>
+    </div>
+  );
+}
+
+function MarksTracker({ course, onChange }: { course: Course; onChange: (assessments: AssessmentItem[]) => void }) {
+  const assessments = assessmentsFor(course);
+  const max = assessments.reduce((sum, item) => sum + Math.max(0, item.maxMarks), 0);
+  const obtained = assessments.reduce(
+    (sum, item) => sum + Math.min(Math.max(0, item.obtainedMarks), Math.max(0, item.maxMarks)),
+    0,
+  );
+  const percentage = max > 0 ? (obtained / max) * 100 : 0;
+  const projected = gradeFromPercent(percentage);
+
+  const update = (id: string, patch: Partial<AssessmentItem>) => {
+    onChange(assessments.map(item => item.id === id ? { ...item, ...patch } : item));
+  };
+
+  const addAssessment = () => {
+    onChange([...assessments, {
+      id: crypto.randomUUID(),
+      label: "New component",
+      maxMarks: 10,
+      obtainedMarks: 0,
+    }]);
+  };
+
+  return (
+    <div className="mt-2 rounded-xl border border-primary/25 bg-primary/5 p-3 space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] uppercase tracking-widest font-mono text-primary">Marks tracker · {course.code}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            CT, mid, final, attendance, assignment, lab, or any custom component.
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-xs font-mono">
+          <span className="text-foreground">{obtained.toFixed(1)} / {max.toFixed(1)}</span>
+          <span className="text-primary font-bold">{percentage.toFixed(1)}%</span>
+          <Badge variant="outline" className="border-secondary/40 text-secondary">{projected.grade}</Badge>
+          <Button size="sm" variant="outline" className="h-7 border-primary/40 text-primary" onClick={addAssessment}>
+            <Plus className="size-3 mr-1" /> Add
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        {assessments.map(item => (
+          <div key={item.id} className="grid grid-cols-[minmax(120px,1fr)_90px_90px_28px] items-center gap-2">
+            <Input
+              value={item.label}
+              onChange={e => update(item.id, { label: e.target.value })}
+              className="h-8 text-xs bg-background border-border"
+              aria-label="Assessment name"
+            />
+            <Input
+              type="number" min="0" step="0.5" value={item.maxMarks}
+              onChange={e => update(item.id, { maxMarks: Math.max(0, Number(e.target.value) || 0) })}
+              className="h-8 text-xs font-mono text-center bg-background border-border"
+              aria-label={`${item.label} maximum marks`}
+            />
+            <Input
+              type="number" min="0" step="0.5" value={item.obtainedMarks}
+              onChange={e => update(item.id, { obtainedMarks: Math.max(0, Number(e.target.value) || 0) })}
+              className="h-8 text-xs font-mono text-center bg-background border-primary/40"
+              aria-label={`${item.label} obtained marks`}
+            />
+            <button
+              onClick={() => onChange(assessments.filter(candidate => candidate.id !== item.id))}
+              className="p-1 text-muted-foreground/50 hover:text-destructive transition-colors"
+              title={`Remove ${item.label}`}
+            >
+              <Trash2 className="size-3" />
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-[minmax(120px,1fr)_90px_90px_28px] gap-2 text-[9px] uppercase tracking-widest font-mono text-muted-foreground px-1 -mt-1">
+        <span>Component</span><span className="text-center">Max</span><span className="text-center">Obtained</span><span />
+      </div>
     </div>
   );
 }
@@ -157,6 +265,7 @@ export function Academics() {
   const [editingTrimester, setEditingTrimester] = useState(false);
   const [trimesterDraft, setTrimesterDraft]     = useState(currentTrimester);
   const [filterCategory, setFilterCategory]     = useState<NoteLinkCategory | "All">("All");
+  const [expandedMarks, setExpandedMarks]       = useState<string | null>(null);
 
   const completed = courses.filter(c => c.status === "completed");
   const running   = courses.filter(c => c.status === "running");
@@ -183,7 +292,15 @@ export function Academics() {
 
   const addRunningCourse = (c: any) => setCourses([...courses, c]);
 
-  const deleteRunning = (id: string) => setCourses(courses.filter(c => c.id !== id));
+  const deleteCourse = (id: string) => {
+    if (window.confirm("Remove this course from the tracker?")) {
+      setCourses(courses.filter(c => c.id !== id));
+      if (expandedMarks === id) setExpandedMarks(null);
+    }
+  };
+
+  const updateAssessments = (id: string, assessments: AssessmentItem[]) =>
+    setCourses(courses.map(c => c.id === id ? { ...c, assessments } : c));
 
   const closeTrimester = () => {
     // Mark all running as completed, keep the trimester label
@@ -297,7 +414,8 @@ export function Academics() {
                       <TableHead className="text-[10px] font-mono uppercase tracking-widest">Title</TableHead>
                       <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">Cr</TableHead>
                       <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">Grade</TableHead>
-                      <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">GPA</TableHead>
+                       <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">GPA</TableHead>
+                       <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest w-10" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -318,7 +436,16 @@ export function Academics() {
                             <TableCell className="text-sm">{course.title}</TableCell>
                             <TableCell className="text-right font-mono text-xs">{course.credits}</TableCell>
                             <TableCell className="text-right font-mono text-xs text-primary">{course.grade}</TableCell>
-                            <TableCell className="text-right font-mono text-xs">{course.gpa.toFixed(2)}</TableCell>
+                           <TableCell className="text-right font-mono text-xs">{course.gpa.toFixed(2)}</TableCell>
+                           <TableCell className="text-right">
+                             <button
+                               onClick={() => deleteCourse(course.id)}
+                               className="text-muted-foreground/40 hover:text-destructive transition-colors p-1"
+                               title="Remove course"
+                             >
+                               <Trash2 className="size-3" />
+                             </button>
+                           </TableCell>
                           </TableRow>
                         )),
                         <TableRow key={`${sem}-avg`} className="border-b-2 border-border/50 bg-muted/20">
@@ -425,7 +552,8 @@ export function Academics() {
                         <TableHead className="text-[10px] font-mono uppercase tracking-widest">Title</TableHead>
                         <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">Cr</TableHead>
                         <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest w-36">Target Grade</TableHead>
-                        <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest w-10" />
+                         <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest">Marks</TableHead>
+                         <TableHead className="text-right text-[10px] font-mono uppercase tracking-widest w-10" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -444,8 +572,18 @@ export function Academics() {
                               </SelectContent>
                             </Select>
                           </TableCell>
-                          <TableCell className="text-right">
-                            <button onClick={() => deleteRunning(course.id)}
+                           <TableCell className="text-right">
+                             <Button
+                               size="sm"
+                               variant="ghost"
+                               className="h-7 px-2 text-[10px] text-primary hover:bg-primary/10"
+                               onClick={() => setExpandedMarks(expandedMarks === course.id ? null : course.id)}
+                             >
+                               {expandedMarks === course.id ? "Hide" : "Track"}
+                             </Button>
+                           </TableCell>
+                           <TableCell className="text-right">
+                             <button onClick={() => deleteCourse(course.id)}
                               className="text-muted-foreground/40 hover:text-destructive transition-colors p-1">
                               <Trash2 className="size-3" />
                             </button>
@@ -454,6 +592,13 @@ export function Academics() {
                       ))}
                     </TableBody>
                   </Table>
+                   {running.map(course => expandedMarks === course.id ? (
+                     <MarksTracker
+                       key={`${course.id}-marks`}
+                       course={course}
+                       onChange={assessments => updateAssessments(course.id, assessments)}
+                     />
+                   ) : null)}
                 </div>
               )}
             </CardContent>
