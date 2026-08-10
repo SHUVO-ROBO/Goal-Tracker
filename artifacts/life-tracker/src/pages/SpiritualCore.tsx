@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, History } from "lucide-react";
 
 // Prayer Arabic names + times (approximate — user adjusts daily)
 const PRAYERS = [
@@ -91,6 +94,17 @@ export function SpiritualCore() {
         </p>
       </div>
 
+      <Tabs value={activeTab} onValueChange={value => setActiveTab(value as "today" | "history")} className="w-full">
+      <TabsList className="grid w-full grid-cols-2 bg-card border border-border h-auto p-1 gap-1">
+        <TabsTrigger value="today" className="font-mono text-[11px] uppercase py-2 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+          <BookOpen className="size-3 mr-1.5" /> Today&apos;s practice
+        </TabsTrigger>
+        <TabsTrigger value="history" className="font-mono text-[11px] uppercase py-2 data-[state=active]:bg-secondary/15 data-[state=active]:text-secondary">
+          <History className="size-3 mr-1.5" /> Reflection archive
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="today" className="space-y-8 m-0">
       {/* ── Stats Row ── */}
       <div className="grid grid-cols-3 gap-4">
         <Card className="bg-card/60 border-border islamic-card text-center py-5">
@@ -267,6 +281,53 @@ export function SpiritualCore() {
           "رَبِّ زِدْنِي عِلْمًا — My Lord, increase me in knowledge." (Ta-Ha 20:114)
         </p>
       </div>
+      </TabsContent>
+
+      <TabsContent value="history" className="space-y-4 m-0">
+        <Card className="bg-card/60 border-border islamic-card">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-mono text-sm uppercase tracking-widest text-secondary flex items-center gap-2">
+              <History className="size-4" /> Ayah & reflection archive
+            </CardTitle>
+            <Badge variant="outline" className="font-mono text-[10px] border-secondary/40 text-secondary">
+              {Object.keys(spiritualLogs).length} days
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            {Object.keys(spiritualLogs).length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border/50 p-10 text-center text-sm text-muted-foreground">
+                Your saved reflections will appear here after today&apos;s practice.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {Object.values(spiritualLogs)
+                  .sort((a, b) => b.date.localeCompare(a.date))
+                  .map(log => {
+                    const count = Object.values(log.prayers).filter(Boolean).length;
+                    return (
+                      <div key={log.date} className="rounded-xl border border-border/40 bg-background/35 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="font-mono text-xs text-primary">{format(new Date(`${log.date}T00:00:00`), "dd MMMM yyyy")}</div>
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
+                            <span>{count}/5 salah</span>
+                            <span className={log.implemented ? "text-secondary" : "text-muted-foreground"}>{log.implemented ? "Principle implemented" : "Principle pending"}</span>
+                          </div>
+                        </div>
+                        {log.ayah && <div className="mt-3 font-medium text-sm text-foreground">{log.ayah}</div>}
+                        {log.meaning && <p className="mt-1 text-sm text-muted-foreground font-amiri">{log.meaning}</p>}
+                        {log.reflection && <p className="mt-3 border-l-2 border-warning/40 pl-3 text-sm leading-6 text-foreground/80">{log.reflection}</p>}
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <div className="text-center">
+          <Button variant="outline" size="sm" onClick={() => setActiveTab("today")}>Back to today&apos;s practice</Button>
+        </div>
+      </TabsContent>
+      </Tabs>
 
     </div>
   );

@@ -1,0 +1,254 @@
+হ্যাঁ, আমি তোমার আগের দুইটা prompt-এর সাথে বর্তমান code মিলিয়ে check করেছি। আগেরবার কিছু কাজ complete বলা হয়েছিল, কিন্তু বাস্তবে অনেক feature এখনো বাকি আছে। সঠিক status নিচে দিলাম।
+
+✅ যেগুলো করা হয়েছে
+1. GitHub Pages refresh 404 fix — Code-এ complete
+এখন routing hash-based:
+
+https://SHUVO-ROBO.github.io/Goal-Tracker/#/academics
+
+Refresh করলে আগের মতো সরাসরি 404 হওয়ার কথা না।
+
+কিন্তু: এই change এখনো GitHub-এ push হয়নি। তাই live website-এ দেখতে হলে push করতে হবে।
+
+2. Course delete — Complete
+Academics page-এ:
+
+Running course delete করা যায়
+Completed course delete করা যায়
+Delete করার আগে confirmation আসে
+3. CT/MID/Final/Attendance/Assignment marks tracker — Partial complete
+প্রতি running course-এ Track button এসেছে।
+
+Default components:
+
+CT 1 — 20
+CT 2 — 20
+Midterm — 30
+Final — 40
+Attendance — 5
+Assignment — 5
+এছাড়া:
+
+Max marks edit করা যায়
+Obtained marks edit করা যায়
+Custom component যেমন Lab, Quiz যোগ করা যায়
+Percentage দেখায়
+UIU grade দেখায়
+⚠️ এখনো অসম্পূর্ণ
+Marks-এর percentage থেকে course-এর actual GPA/CGPA এখনো automatically update হচ্ছে না। বর্তমানে এটা শুধু marks tracker-এর ভিতরে projected grade দেখায়। এটা আমাকে আরও integrate করতে হবে।
+
+4. UIU grading policy — Partial complete
+এই grades যোগ করা হয়েছে:
+
+A   = 4.00
+A-  = 3.67
+B+  = 3.33
+B   = 3.00
+B-  = 2.67
+C+  = 2.33
+C   = 2.00
+C-  = 1.67
+D+  = 1.33
+D   = 1.00
+F   = 0.00
+
+কিন্তু marks tracker থেকে course GPA এবং dashboard CGPA automatically calculate করার কাজ এখনো বাকি।
+
+5. Vision থেকে Bangla NLP সরানো — Complete
+Vision এখন:
+
+Building scalable AI systems focused on MLOps and production-grade machine learning.
+
+6. Existing features যেগুলো আগেই ছিল
+এগুলো project-এ আছে:
+
+50 scholarships
+Scholarship search
+Country filter
+Deadline edit
+Scholarship status change
+Requirements checkbox
+Documents checklist
+IELTS tracker
+IELTS mock test log
+Cambridge test progress
+Certificate progress
+ML/AI pipeline progress
+ECA/internship status
+Salah tracker
+Quran/ayah/reflection daily save
+7-day spiritual heatmap
+Vocabulary add
+Days-to-graduation counter
+CGPA এবং completed credits dashboard stats
+Theme switcher
+❌ যেগুলো এখনো করা হয়নি
+1. Unified new Dashboard — নেই
+Prompt-এ চাওয়া ছিল:
+
+Academic summary
+MS Abroad summary
+AI/ML summary
+Spiritual summary
+ECA summary
+Financial crisis summary
+Completion percentage
+Colorful progress rings/table
+বর্তমান Dashboard-এ শুধু:
+
+Vision/Mission
+CGPA
+ML/AI pipeline
+Certificates
+Scholarships
+Target universities
+Distraction firewall
+নতুন unified 6-segment summary dashboard এখনো তৈরি হয়নি।
+
+2. 24-hour activity summary — নেই
+আজকে ২৪ ঘণ্টায় কী কী করেছো, সেটা automatic timeline/grid হিসেবে দেখানোর feature নেই।
+
+3. Daily To-do list — নেই
+Dashboard-এ daily planner বা checkbox todo section এখনো নেই।
+
+4. Focus timer — নেই
+Pomodoro/focus countdown timer এখনো নেই।
+
+5. Portfolio link — নেই
+এই portfolio link এখনো globally add করা হয়নি:
+
+https://shuvo-robo.github.io/portfolio/
+
+6. Flexible Research Hub — নেই
+বর্তমান Research Hub fixed:
+
+Islamic HCI title
+Fixed paper stages
+One notes field
+Published paper count
+কিন্তু এখনো করা হয়নি:
+
+Custom research topic add
+Multiple topics
+Research paper save
+Milestone save
+Topic-wise notes
+Different research area update
+7. Document/File Vault — নেই
+বর্তমানে Documents শুধু checklist:
+
+Not Started
+In Progress
+Done
+
+কিন্তু এখনো নেই:
+
+PDF upload
+Certificate upload
+Word document upload
+Project file vault
+Research file storage
+Idea/project archive
+8. Dynamic ECA — Partial
+ECA page-এ fixed internship/role list আছে।
+
+কিন্তু এখনো নেই:
+
+নতুন ECA add
+UGA add
+Club role add
+Extracurricular add
+Existing ECA delete
+Custom ECA edit
+9. Scholarship full CRUD — Partial
+বর্তমানে করা যায়:
+
+Deadline edit
+Status change
+Requirements checkbox
+Search/filter
+কিন্তু এখনো করা যায় না:
+
+নতুন scholarship add
+Scholarship name edit
+Scholarship delete
+Requirements/time সম্পূর্ণ edit
+10. Vocabulary one-edit-per-day rule — নেই
+বর্তমানে vocabulary add করা যায়, কিন্তু:
+
+Edit করা যায় না
+দিনে একবার edit limit নেই
+Duplicate/day validation নেই
+11. Ayah/Reflection permanent history screen — Partial
+Data localStorage-এ date অনুযায়ী save হচ্ছে এবং spiritual log object-এ জমছে।
+
+কিন্তু history tab/UI properly দেখানোর screen এখনো নেই। Code-এ activeTab state আছে, কিন্তু ব্যবহার করা হয়নি।
+
+12. Financial Crisis Plan — নেই
+Family financial crisis ও fully-funded MS preparation-এর জন্য আলাদা timeline/tracker এখনো নেই।
+
+13. Course-wise Lecture Notes Archive — Partial
+Academic Notes & Links আছে, যেখানে subject name দিয়ে link save করা যায়।
+
+কিন্তু এখনো নেই:
+
+প্রতিটি course-এর dedicated notes vault
+Full lecture notes archive
+Course-wise revision section
+Course-specific document storage
+14. Same email দিয়ে cross-device sync — নেই
+এটা সবচেয়ে গুরুত্বপূর্ণ:
+
+GitHub Pages + localStorage দিয়ে এই কাজ সম্ভব নয়।
+
+তোমার data এখন থাকে:
+
+প্রতিটি browser-এর localStorage-এ
+
+তাই:
+
+Same PC + same browser → data থাকবে
+অন্য PC → data দেখা যাবে না
+অন্য browser → data আলাদা হবে
+Same email দিয়ে login → এখনো login system নেই
+Supabase integration connect করার proposal তুমি cancel করেছো, তাই secure login/cloud sync এখনো তৈরি করা হয়নি।
+
+বর্তমান code বনাম live GitHub
+Local Replit project-এ আমার changes আছে:
+
+985eca8 Restore GitHub Pages automatic deployment
+fb04761 Add hash routing and flexible course marks tracker
+
+কিন্তু GitHub push authentication fail করেছে:
+
+Invalid username or token
+
+তাই live link এখনো নতুন code পায়নি।
+
+Push করার জন্য:
+
+gh auth login
+
+তারপর:
+
+GitHub.com
+HTTPS
+Login with a web browser
+
+শেষে:
+
+git push origin main
+
+তারপর GitHub-এর Actions tab থেকে deployment শেষ হওয়া পর্যন্ত অপেক্ষা করবে।
+
+সংক্ষেপে
+Complete: routing fix, course delete, marks tracker basic version, UIU grades, Vision update, existing trackers।
+
+Partial: marks-to-CGPA, research hub, ECA, scholarship CRUD, reflection history, course notes।
+
+Not done: unified dashboard, 24-hour summary, todo, focus timer, uploads/vault, portfolio link, financial plan, cross-device login/sync।
+
+তোমার prompt অনুযায়ী এখনো মূলত দুইটা বড় development phase বাকি:
+
+Full dashboard + daily productivity system
+Cloud login + cross-device database sync

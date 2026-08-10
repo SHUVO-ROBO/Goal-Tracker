@@ -59,6 +59,42 @@ export const DEFAULT_ASSESSMENTS: AssessmentItem[] = [
   { id: "assignment", label: "Assignment", maxMarks: 5, obtainedMarks: 0 },
 ];
 
+export type TodoItem = {
+  id: string;
+  title: string;
+  completed: boolean;
+  date: string;
+  category: "Academic" | "AI/ML" | "IELTS" | "Spiritual" | "Personal";
+};
+
+export type FinancialMilestone = {
+  id: string;
+  title: string;
+  target: string;
+  status: "Planned" | "In Progress" | "Done";
+  notes: string;
+};
+
+export type ResearchTopic = {
+  id: string;
+  title: string;
+  area: string;
+  stage: HCIPaperStage;
+  notes: string;
+  papers: number;
+  milestones: string[];
+};
+
+export const INITIAL_TODOS: TodoItem[] = [
+  { id: "todo-1", title: "Review this week's course notes", completed: false, date: "", category: "Academic" },
+  { id: "todo-2", title: "Practice one IELTS writing task", completed: false, date: "", category: "IELTS" },
+];
+
+export const INITIAL_FINANCIAL_MILESTONES: FinancialMilestone[] = [
+  { id: "finance-1", title: "Build a fully-funded application shortlist", target: "10 programs", status: "In Progress", notes: "Prioritize MIT, Stanford, ETH Zurich, NUS and funded PhD routes." },
+  { id: "finance-2", title: "Create an application emergency fund", target: "BDT 150,000", status: "Planned", notes: "Track test fees, document attestation, application and travel costs." },
+];
+
 export type SelfReview = {
   id: string; task: string; duration: string; completed: boolean; notes: string;
 };
@@ -105,6 +141,17 @@ export type HCIPaperStage =
   | "Literature Review" | "Data Collection" | "Experimentation" | "Paper Drafting" | "Conference Submission";
 export type HCITracker = { stage: HCIPaperStage; notes: string; papersPublished: number; };
 export const INITIAL_HCI: HCITracker = { stage: "Literature Review", notes: "", papersPublished: 0 };
+export const INITIAL_RESEARCH_TOPICS: ResearchTopic[] = [
+  {
+    id: "research-1",
+    title: "Islamic HCI & Quran-based AI",
+    area: "Human-centered AI",
+    stage: "Literature Review",
+    notes: "",
+    papers: 0,
+    milestones: [],
+  },
+];
 
 // ── Certificates ────────────────────────────────────────────────────────────────
 export type CertProvider = "IBM" | "Coursera" | "Microsoft" | "Google" | "Other";
@@ -293,6 +340,7 @@ export function useAppStore() {
   const [noteLinks, setNoteLinks]               = useLocalStorage<NoteLink[]>          ("life_tracker_note_links",         []);
   const [pipeline, setPipeline]                 = useLocalStorage<PipelineStage[]>     ("life_tracker_pipeline",           INITIAL_PIPELINE);
   const [hci, setHci]                           = useLocalStorage<HCITracker>          ("life_tracker_hci",                INITIAL_HCI);
+  const [researchTopics, setResearchTopics]     = useLocalStorage<ResearchTopic[]>     ("life_tracker_research_topics",  INITIAL_RESEARCH_TOPICS);
   const [distractionLog, setDistractionLog]     = useLocalStorage<DistractionLog>      ("life_tracker_distractions",       INITIAL_DISTRACTION_LOG);
   const [documents, setDocuments]               = useLocalStorage<DocumentChecklist[]> ("life_tracker_documents",          INITIAL_DOCUMENTS);
   const [scholarships, setScholarships]         = useLocalStorage<Scholarship[]>       ("life_tracker_scholarships",       INITIAL_SCHOLARSHIPS);
@@ -303,6 +351,8 @@ export function useAppStore() {
   const [vocab, setVocab]                       = useLocalStorage<{word:string;date:string}[]>("life_tracker_vocab",       []);
   const [cambridgeTests, setCambridgeTests]     = useLocalStorage<number>              ("life_tracker_cambridge_tests",    0);
   const [spiritualLogs, setSpiritualLogs]       = useLocalStorage<Record<string, DailyQuranRecord>>("life_tracker_spiritual", {});
+  const [todos, setTodos]                       = useLocalStorage<TodoItem[]>           ("life_tracker_todos",            INITIAL_TODOS);
+  const [financialMilestones, setFinancialMilestones] = useLocalStorage<FinancialMilestone[]>("life_tracker_financial", INITIAL_FINANCIAL_MILESTONES);
 
   return {
     courses, setCourses,
@@ -311,6 +361,7 @@ export function useAppStore() {
     noteLinks, setNoteLinks,
     pipeline, setPipeline,
     hci, setHci,
+    researchTopics, setResearchTopics,
     distractionLog, setDistractionLog,
     documents, setDocuments,
     scholarships, setScholarships,
@@ -321,5 +372,7 @@ export function useAppStore() {
     vocab, setVocab,
     cambridgeTests, setCambridgeTests,
     spiritualLogs, setSpiritualLogs,
+    todos, setTodos,
+    financialMilestones, setFinancialMilestones,
   };
 }

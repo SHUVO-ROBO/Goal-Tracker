@@ -43,9 +43,11 @@ function gradeFromPercent(percent: number) {
 }
 
 function assessmentsFor(course: Course): AssessmentItem[] {
-  return course.assessments?.length
-    ? course.assessments
-    : DEFAULT_ASSESSMENTS.map(item => ({ ...item }));
+  // `undefined` is the legacy shape: keep its familiar starter rows.
+  // An explicit empty array means this course intentionally has no components yet.
+  return course.assessments === undefined
+    ? DEFAULT_ASSESSMENTS.map(item => ({ ...item }))
+    : course.assessments;
 }
 
 const NOTE_CATEGORIES: NoteLinkCategory[] = [
@@ -82,6 +84,7 @@ function AddCourseRow({ trimester, onAdd }: { trimester: string; onAdd: (c: any)
       gpa: GRADE_POINTS[form.grade] ?? 4.00,
       semester: trimester,
       status: "running",
+      assessments: [],
     });
     setForm({ code: "", title: "", credits: "3", grade: "A" });
     setOpen(false);
@@ -158,7 +161,12 @@ function MarksTracker({ course, onChange }: { course: Course; onChange: (assessm
         </div>
       </div>
 
-      <div className="grid gap-2">
+       {assessments.length === 0 && (
+         <div className="rounded-lg border border-dashed border-primary/30 bg-background/40 p-4 text-center text-xs text-muted-foreground">
+           No assessment components yet. Add only the components this course uses.
+         </div>
+       )}
+       <div className="grid gap-2">
         {assessments.map(item => (
           <div key={item.id} className="grid grid-cols-[minmax(120px,1fr)_90px_90px_28px] items-center gap-2">
             <Input
@@ -299,8 +307,20 @@ export function Academics() {
     }
   };
 
-  const updateAssessments = (id: string, assessments: AssessmentItem[]) =>
-    setCourses(courses.map(c => c.id === id ? { ...c, assessments } : c));
+  const updateAssessments = (id: string, assessments: AssessmentItem[]) => {
+    const max = assessments.reduce((sum, item) => sum + Math.max(0, item.maxMarks), 0);
+    const obtained = assessments.reduce(
+      (sum, item) => sum + Math.min(Math.max(0, item.obtainedMarks), Math.max(0, item.maxMarks)),
+      0,
+    );
+    const hasMarks = assessments.some(item => item.obtainedMarks > 0);
+    const projected = max > 0 ? gradeFromPercent((obtained / max) * 100) : null;
+    setCourses(courses.map(c => c.id === id ? {
+      ...c,
+      assessments,
+      ...(hasMarks && projected ? { grade: projected.grade, gpa: projected.gpa } : {}),
+    } : c));
+  };
 
   const closeTrimester = () => {
     // Mark all running as completed, keep the trimester label

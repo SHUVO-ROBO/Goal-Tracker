@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Globe, GraduationCap, FileText, Briefcase, Plus,
   CalendarDays, Info, Pencil, Check, X, ChevronDown, ChevronUp,
-  BookOpen, Mic, PenLine, Headphones,
+  BookOpen, Mic, PenLine, Headphones, Trash2,
 } from "lucide-react";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -331,6 +331,13 @@ export function MSAbroad() {
   const [deadlineDraft, setDeadlineDraft]     = useState("");
   const [scholSearch, setScholSearch]   = useState("");
   const [scholFilter, setScholFilter]   = useState<string>("All");
+  const [showScholarshipForm, setShowScholarshipForm] = useState(false);
+  const [newScholarship, setNewScholarship] = useState({ name: "", country: "", deadline: "", notes: "" });
+  const [showEcaForm, setShowEcaForm] = useState(false);
+  const [newEca, setNewEca] = useState({ name: "", deadline: "", notes: "" });
+  const [editingVocab, setEditingVocab] = useState<number | null>(null);
+  const [vocabDraft, setVocabDraft] = useState("");
+  const [vocabMessage, setVocabMessage] = useState("");
 
   const doneCount  = documents.filter(d => d.status === "Done").length;
   const docProgress = Math.round((doneCount / documents.length) * 100);
@@ -355,6 +362,54 @@ export function MSAbroad() {
   const saveDeadline = (id: string) => {
     setScholarships(scholarships.map(s => s.id === id ? { ...s, deadline: deadlineDraft } : s));
     setEditingDeadline(null);
+  };
+
+  const addScholarship = () => {
+    if (!newScholarship.name.trim()) return;
+    setScholarships([{
+      id: crypto.randomUUID(),
+      name: newScholarship.name.trim(),
+      country: newScholarship.country.trim() || "Custom",
+      deadline: newScholarship.deadline || "TBA",
+      status: "Researching",
+      metRequirements: false,
+      notes: newScholarship.notes.trim(),
+    }, ...scholarships]);
+    setNewScholarship({ name: "", country: "", deadline: "", notes: "" });
+    setShowScholarshipForm(false);
+  };
+
+  const addEca = () => {
+    if (!newEca.name.trim()) return;
+    setInternships([...internships, {
+      id: crypto.randomUUID(),
+      name: newEca.name.trim(),
+      deadline: newEca.deadline.trim() || "TBA",
+      status: "Not Applied",
+      notes: newEca.notes.trim(),
+    }]);
+    setNewEca({ name: "", deadline: "", notes: "" });
+    setShowEcaForm(false);
+  };
+
+  const localDate = new Date().toISOString().slice(0, 10);
+  const addVocabulary = () => {
+    const word = newVocab.trim();
+    if (!word) return;
+    if (vocab.some(v => v.date.slice(0, 10) === localDate)) {
+      setVocabMessage("You already have one vocabulary entry for today. Edit that entry instead.");
+      return;
+    }
+    setVocab([{ word, date: new Date().toISOString() }, ...vocab]);
+    setNewVocab("");
+    setVocabMessage("");
+  };
+
+  const saveVocabulary = (index: number) => {
+    if (!vocabDraft.trim()) return;
+    setVocab(vocab.map((entry, i) => i === index ? { ...entry, word: vocabDraft.trim() } : entry));
+    setEditingVocab(null);
+    setVocabMessage("");
   };
 
   const allCountries = ["All", ...Array.from(new Set(scholarships.map(s => s.country)))];
@@ -417,7 +472,22 @@ export function MSAbroad() {
                     {allCountries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
+                  <Button size="sm" className="h-8 ml-auto" onClick={() => setShowScholarshipForm(!showScholarshipForm)}>
+                    <Plus className="size-3 mr-1" /> Add scholarship
+                  </Button>
               </div>
+                {showScholarshipForm && (
+                  <div className="mt-3 grid gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 sm:grid-cols-2">
+                    <Input placeholder="Program name *" value={newScholarship.name} onChange={e => setNewScholarship({ ...newScholarship, name: e.target.value })} className="h-8 text-xs bg-background" />
+                    <Input placeholder="Country / region" value={newScholarship.country} onChange={e => setNewScholarship({ ...newScholarship, country: e.target.value })} className="h-8 text-xs bg-background" />
+                    <Input type="date" value={newScholarship.deadline} onChange={e => setNewScholarship({ ...newScholarship, deadline: e.target.value })} className="h-8 text-xs bg-background" />
+                    <Input placeholder="Notes" value={newScholarship.notes} onChange={e => setNewScholarship({ ...newScholarship, notes: e.target.value })} className="h-8 text-xs bg-background" />
+                    <div className="sm:col-span-2 flex gap-2">
+                      <Button size="sm" className="h-8" onClick={addScholarship}><Check className="size-3 mr-1" /> Save</Button>
+                      <Button size="sm" variant="ghost" className="h-8" onClick={() => setShowScholarshipForm(false)}>Cancel</Button>
+                    </div>
+                  </div>
+                )}
             </CardHeader>
 
             <CardContent className="p-0">
@@ -431,6 +501,7 @@ export function MSAbroad() {
                       <th className="py-3 px-2">Deadline ✎</th>
                       <th className="py-3 px-2 hidden sm:table-cell">Reqs</th>
                       <th className="py-3 px-2">Status</th>
+                      <th className="py-3 px-2 w-8" />
                     </tr>
                   </thead>
                   <tbody>
@@ -491,10 +562,15 @@ export function MSAbroad() {
                               </SelectContent>
                             </Select>
                           </td>
+                          <td className="py-2.5 px-2" onClick={e => e.stopPropagation()}>
+                            <button onClick={() => setScholarships(scholarships.filter(s => s.id !== schol.id))} className="text-muted-foreground/40 hover:text-destructive p-1" title="Delete scholarship">
+                              <Trash2 className="size-3" />
+                            </button>
+                          </td>
                         </tr>
                         {expandedSchol === schol.id && schol.notes && (
                           <tr className="border-b border-border/20 bg-primary/5">
-                            <td colSpan={6} className="px-4 py-2.5">
+                            <td colSpan={7} className="px-4 py-2.5">
                               <div className="flex items-start gap-2 text-xs text-muted-foreground font-mono">
                                 <Info className="size-3 mt-0.5 text-primary shrink-0" />
                                 {schol.notes}
@@ -659,22 +735,36 @@ export function MSAbroad() {
               <CardTitle className="font-mono text-sm uppercase text-muted-foreground">Daily Vocabulary Log</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2 mb-4">
+                  <div className="flex gap-2 mb-2">
                 <Input placeholder="New word or phrase..." value={newVocab}
                   onChange={e => setNewVocab(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter" && newVocab.trim()) { setVocab([{ word: newVocab.trim(), date: new Date().toISOString() }, ...vocab]); setNewVocab(""); }}}
+                   onKeyDown={e => { if (e.key === "Enter") addVocabulary(); }}
                   className="h-9 font-mono text-sm bg-background border-border" />
-                <Button onClick={() => { if (newVocab.trim()) { setVocab([{ word: newVocab.trim(), date: new Date().toISOString() }, ...vocab]); setNewVocab(""); }}}
+                 <Button onClick={addVocabulary}
                   size="sm" className="h-9 px-3 bg-secondary text-secondary-foreground hover:bg-secondary/90">
                   <Plus className="size-4" />
                 </Button>
               </div>
+               {vocabMessage && <p className="mb-3 text-xs text-warning font-mono">{vocabMessage}</p>}
               <div className="h-40 overflow-y-auto space-y-1.5 pr-1">
                 {vocab.length === 0 && <p className="text-xs text-muted-foreground font-mono text-center py-4">No words logged yet.</p>}
-                {vocab.map((v, i) => (
+                 {vocab.map((v, i) => (
                   <div key={i} className="flex justify-between items-center text-sm p-2 rounded bg-background/50 border border-border/40">
-                    <span className="font-mono text-secondary">{v.word}</span>
-                    <span className="text-[10px] text-muted-foreground">{new Date(v.date).toLocaleDateString()}</span>
+                     {editingVocab === i ? (
+                       <div className="flex flex-1 gap-2">
+                         <Input value={vocabDraft} onChange={e => setVocabDraft(e.target.value)} className="h-7 text-xs bg-background" autoFocus />
+                         <button onClick={() => saveVocabulary(i)} className="text-secondary"><Check className="size-3" /></button>
+                         <button onClick={() => setEditingVocab(null)} className="text-muted-foreground"><X className="size-3" /></button>
+                       </div>
+                     ) : (
+                       <>
+                         <span className="font-mono text-secondary">{v.word}</span>
+                         <span className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                           {new Date(v.date).toLocaleDateString()}
+                           {v.date.slice(0, 10) === localDate && <button onClick={() => { setEditingVocab(i); setVocabDraft(v.word); }} className="text-primary hover:text-primary/80"><Pencil className="size-3" /></button>}
+                         </span>
+                       </>
+                     )}
                   </div>
                 ))}
               </div>
@@ -684,20 +774,32 @@ export function MSAbroad() {
 
         {/* ══ ECA ══════════════════════════════════════════════════════════ */}
         <TabsContent value="internships" className="space-y-4 m-0">
-          <Card className="bg-card/60 border-border islamic-card">
-            <CardHeader><CardTitle className="font-mono text-sm uppercase text-warning">ECA & Community Roles</CardTitle></CardHeader>
+           <Card className="bg-card/60 border-border islamic-card">
+             <CardHeader className="flex flex-row items-center justify-between">
+               <CardTitle className="font-mono text-sm uppercase text-warning">ECA & Community Roles</CardTitle>
+               <Button size="sm" variant="outline" className="h-8 border-warning/40 text-warning" onClick={() => setShowEcaForm(!showEcaForm)}><Plus className="size-3 mr-1" /> Add role</Button>
+             </CardHeader>
             <CardContent>
+               {showEcaForm && (
+                 <div className="mb-4 grid gap-2 rounded-xl border border-warning/25 bg-warning/5 p-3 sm:grid-cols-3">
+                   <Input placeholder="Role / activity *" value={newEca.name} onChange={e => setNewEca({ ...newEca, name: e.target.value })} className="h-8 text-xs bg-background" />
+                   <Input placeholder="Deadline" value={newEca.deadline} onChange={e => setNewEca({ ...newEca, deadline: e.target.value })} className="h-8 text-xs bg-background" />
+                   <Input placeholder="Notes" value={newEca.notes} onChange={e => setNewEca({ ...newEca, notes: e.target.value })} className="h-8 text-xs bg-background" />
+                   <div className="sm:col-span-3 flex gap-2"><Button size="sm" className="h-8" onClick={addEca}><Check className="size-3 mr-1" /> Save</Button><Button size="sm" variant="ghost" className="h-8" onClick={() => setShowEcaForm(false)}>Cancel</Button></div>
+                 </div>
+               )}
               <div className="grid gap-3">
                 {internships.map(int => (
                   <div key={int.id} className="p-4 rounded-lg border border-border/40 bg-background/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
+                     <div className="min-w-0 flex-1">
                       <div className="font-medium text-foreground text-sm">{int.name}</div>
                       <div className="flex items-center gap-1 mt-1">
                         <CalendarDays className="size-3 text-muted-foreground" />
                         <span className="text-[11px] font-mono text-muted-foreground">Deadline: {int.deadline}</span>
                       </div>
                     </div>
-                    <Select value={int.status}
+                     <div className="flex items-center gap-2">
+                     <Select value={int.status}
                       onValueChange={v => setInternships(internships.map(i => i.id === int.id ? { ...i, status: v as any } : i))}>
                       <SelectTrigger className={`w-[140px] h-8 text-xs font-mono border ${
                         int.status === "Accepted" ? "text-secondary border-secondary/30 bg-secondary/10" :
@@ -711,6 +813,8 @@ export function MSAbroad() {
                         <SelectItem value="Rejected">Rejected</SelectItem>
                       </SelectContent>
                     </Select>
+                     <button onClick={() => setInternships(internships.filter(i => i.id !== int.id))} className="text-muted-foreground/40 hover:text-destructive p-1" title="Delete ECA"><Trash2 className="size-3" /></button>
+                     </div>
                   </div>
                 ))}
               </div>

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useAppStore, PipelineStage, HCIPaperStage, Certificate, CertProvider } from "@/hooks/use-app-store";
+import { useAppStore, PipelineStage, HCIPaperStage, Certificate, CertProvider, ResearchTopic } from "@/hooks/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2, ArrowRight, BookOpen, Award, Plus, ExternalLink, Cpu } from "lucide-react";
+import { CheckCircle2, ArrowRight, BookOpen, Award, Plus, ExternalLink, Cpu, Trash2, Check, X } from "lucide-react";
 
 // ── Provider color config ────────────────────────────────────────────────────
 const providerStyle: Record<CertProvider, { badge: string; dot: string }> = {
@@ -126,7 +126,10 @@ function CertCard({ cert, onUpdate }: { cert: Certificate; onUpdate: (updated: C
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export function AIPipeline() {
-  const { pipeline, setPipeline, hci, setHci, certificates, setCertificates } = useAppStore();
+  const { pipeline, setPipeline, hci, setHci, certificates, setCertificates, researchTopics, setResearchTopics } = useAppStore();
+  const [showTopicForm, setShowTopicForm] = useState(false);
+  const [newTopic, setNewTopic] = useState({ title: "", area: "" });
+  const [milestoneDrafts, setMilestoneDrafts] = useState<Record<string, string>>({});
 
   const handleStageClick = (id: number) => {
     setPipeline(pipeline.map(stage => {
@@ -154,6 +157,33 @@ export function AIPipeline() {
 
   const updateCert = (updated: Certificate) => {
     setCertificates(certificates.map(c => c.id === updated.id ? updated : c));
+  };
+
+  const addTopic = () => {
+    if (!newTopic.title.trim()) return;
+    const topic: ResearchTopic = {
+      id: crypto.randomUUID(),
+      title: newTopic.title.trim(),
+      area: newTopic.area.trim() || "AI / ML",
+      stage: "Literature Review",
+      notes: "",
+      papers: 0,
+      milestones: [],
+    };
+    setResearchTopics([topic, ...researchTopics]);
+    setNewTopic({ title: "", area: "" });
+    setShowTopicForm(false);
+  };
+
+  const updateTopic = (id: string, patch: Partial<ResearchTopic>) => {
+    setResearchTopics(researchTopics.map(topic => topic.id === id ? { ...topic, ...patch } : topic));
+  };
+
+  const addMilestone = (topic: ResearchTopic) => {
+    const value = (milestoneDrafts[topic.id] || "").trim();
+    if (!value) return;
+    updateTopic(topic.id, { milestones: [...topic.milestones, value] });
+    setMilestoneDrafts({ ...milestoneDrafts, [topic.id]: "" });
   };
 
   // Group certs by provider for display
@@ -295,11 +325,53 @@ export function AIPipeline() {
         <TabsContent value="research" className="m-0">
           <Card className="bg-card/60 border-border islamic-card">
             <CardHeader>
-              <CardTitle className="font-mono text-sm uppercase tracking-widest text-warning flex items-center gap-2">
-                <BookOpen className="size-4" /> Islamic HCI Research Hub
-              </CardTitle>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <CardTitle className="font-mono text-sm uppercase tracking-widest text-warning flex items-center gap-2">
+                  <BookOpen className="size-4" /> Research Hub
+                </CardTitle>
+                <Button size="sm" variant="outline" className="h-8 border-warning/40 text-warning" onClick={() => setShowTopicForm(!showTopicForm)}>
+                  <Plus className="size-3 mr-1" /> Add topic
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {showTopicForm && (
+                <div className="grid gap-2 rounded-xl border border-warning/25 bg-warning/5 p-3 sm:grid-cols-2">
+                  <Input placeholder="Research topic *" value={newTopic.title} onChange={e => setNewTopic({ ...newTopic, title: e.target.value })} className="h-8 text-xs bg-background" />
+                  <Input placeholder="Area / lab / domain" value={newTopic.area} onChange={e => setNewTopic({ ...newTopic, area: e.target.value })} className="h-8 text-xs bg-background" />
+                  <div className="sm:col-span-2 flex gap-2">
+                    <Button size="sm" className="h-8" onClick={addTopic}><Check className="size-3 mr-1" /> Save</Button>
+                    <Button size="sm" variant="ghost" className="h-8" onClick={() => setShowTopicForm(false)}><X className="size-3 mr-1" /> Cancel</Button>
+                  </div>
+                </div>
+              )}
+              <div className="space-y-3">
+                {researchTopics.map(topic => (
+                  <div key={topic.id} className="rounded-xl border border-warning/25 bg-warning/5 p-4 space-y-3">
+                    <div className="flex flex-wrap items-start gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-sm text-foreground">{topic.title}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono mt-1">{topic.area} · {topic.milestones.length} milestone{topic.milestones.length === 1 ? "" : "s"}</div>
+                      </div>
+                      <Input type="number" min={0} value={topic.papers} onChange={e => updateTopic(topic.id, { papers: Math.max(0, Number(e.target.value) || 0) })} className="h-8 w-20 text-xs font-mono text-center bg-background" aria-label={`${topic.title} papers`} />
+                      <button onClick={() => setResearchTopics(researchTopics.filter(candidate => candidate.id !== topic.id))} className="text-muted-foreground/50 hover:text-destructive p-1" title="Delete topic"><Trash2 className="size-3" /></button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {hciStages.map(stage => (
+                        <Button key={stage} size="sm" variant="outline" className={`h-7 text-[10px] ${topic.stage === stage ? "border-warning bg-warning/15 text-warning" : "border-border text-muted-foreground"}`} onClick={() => updateTopic(topic.id, { stage })}>
+                          {stage}
+                        </Button>
+                      ))}
+                    </div>
+                    <textarea value={topic.notes} onChange={e => updateTopic(topic.id, { notes: e.target.value })} placeholder="Topic notes, research question, target venue..." className="w-full h-20 bg-background border border-border rounded-lg p-2 text-xs resize-none text-foreground/90 font-mono" />
+                    <div className="flex gap-2">
+                      <Input value={milestoneDrafts[topic.id] || ""} onChange={e => setMilestoneDrafts({ ...milestoneDrafts, [topic.id]: e.target.value })} onKeyDown={e => { if (e.key === "Enter") addMilestone(topic); }} placeholder="Add milestone..." className="h-8 text-xs bg-background" />
+                      <Button size="sm" variant="outline" className="h-8 border-warning/40 text-warning" onClick={() => addMilestone(topic)}><Plus className="size-3" /></Button>
+                    </div>
+                    {topic.milestones.length > 0 && <div className="flex flex-wrap gap-1.5">{topic.milestones.map((milestone, index) => <button key={`${milestone}-${index}`} onClick={() => updateTopic(topic.id, { milestones: topic.milestones.filter((_, i) => i !== index) })} className="rounded-full border border-warning/25 px-2 py-1 text-[10px] text-warning hover:bg-warning/10" title="Remove milestone">{milestone} ×</button>)}</div>}
+                  </div>
+                ))}
+              </div>
               {/* Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-warning/10 border border-warning/25 rounded-xl p-4 text-center">
