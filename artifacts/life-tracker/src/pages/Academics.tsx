@@ -273,6 +273,7 @@ export function Academics() {
   const [editingTrimester, setEditingTrimester] = useState(false);
   const [trimesterDraft, setTrimesterDraft]     = useState(currentTrimester);
   const [filterCategory, setFilterCategory]     = useState<NoteLinkCategory | "All">("All");
+  const [noteSearch, setNoteSearch]             = useState("");
   const [expandedMarks, setExpandedMarks]       = useState<string | null>(null);
 
   const completed = courses.filter(c => c.status === "completed");
@@ -341,9 +342,12 @@ export function Academics() {
   // ── notes ──
   const addNote = (n: NoteLink) => setNoteLinks([n, ...noteLinks]);
   const deleteNote = (id: string) => setNoteLinks(noteLinks.filter(n => n.id !== id));
-  const filteredNotes = filterCategory === "All"
-    ? noteLinks
-    : noteLinks.filter(n => n.category === filterCategory);
+  const filteredNotes = noteLinks.filter(note => {
+    const matchesCategory = filterCategory === "All" || note.category === filterCategory;
+    const query = noteSearch.trim().toLowerCase();
+    const matchesSearch = !query || `${note.title} ${note.subject} ${note.category}`.toLowerCase().includes(query);
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -692,6 +696,12 @@ export function Academics() {
                   </button>
                 ))}
               </div>
+              <Input
+                value={noteSearch}
+                onChange={event => setNoteSearch(event.target.value)}
+                placeholder="Search by course, title or resource type..."
+                className="mt-3 h-8 max-w-md bg-background text-xs"
+              />
             </CardHeader>
 
             <CardContent>

@@ -307,6 +307,16 @@ export const INITIAL_DOCUMENTS: DocumentChecklist[] = [
   { id:"10", task:"Research Statement",                      status:"Not Started"                                       },
 ];
 
+export type VaultFile = {
+  id: string;
+  name: string;
+  contentType: string;
+  size: number;
+  category: "Application" | "Certificate" | "Transcript" | "Research" | "Course note" | "Other";
+  dataUrl: string;
+  createdAt: string;
+};
+
 export type Internship = {
   id: string; name: string; deadline: string;
   status: "Not Applied" | "Applied" | "Interview" | "Accepted" | "Rejected"; notes: string;
@@ -343,6 +353,7 @@ export function useAppStore() {
   const [researchTopics, setResearchTopics]     = useLocalStorage<ResearchTopic[]>     ("life_tracker_research_topics",  INITIAL_RESEARCH_TOPICS);
   const [distractionLog, setDistractionLog]     = useLocalStorage<DistractionLog>      ("life_tracker_distractions",       INITIAL_DISTRACTION_LOG);
   const [documents, setDocuments]               = useLocalStorage<DocumentChecklist[]> ("life_tracker_documents",          INITIAL_DOCUMENTS);
+  const [vaultFiles, setVaultFiles]               = useLocalStorage<VaultFile[]>        ("life_tracker_vault_files",          []);
   const [scholarships, setScholarships]         = useLocalStorage<Scholarship[]>       ("life_tracker_scholarships",       INITIAL_SCHOLARSHIPS);
   const [internships, setInternships]           = useLocalStorage<Internship[]>        ("life_tracker_internships",        INITIAL_INTERNSHIPS);
   const [certificates, setCertificates]         = useLocalStorage<Certificate[]>       ("life_tracker_certificates",       INITIAL_CERTIFICATES);
@@ -364,6 +375,7 @@ export function useAppStore() {
     researchTopics, setResearchTopics,
     distractionLog, setDistractionLog,
     documents, setDocuments,
+    vaultFiles, setVaultFiles,
     scholarships, setScholarships,
     internships, setInternships,
     certificates, setCertificates,

@@ -35,7 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { useAppStore, type TodoItem } from "@/hooks/use-app-store";
+import { useAppStore, type FinancialMilestone, type TodoItem } from "@/hooks/use-app-store";
 
 const PORTFOLIO_URL = "https://shuvo-robo.github.io/portfolio/";
 
@@ -303,6 +303,7 @@ export function Dashboard() {
     hci,
     spiritualLogs,
     financialMilestones,
+    setFinancialMilestones,
     internships,
   } = useAppStore();
   const today = getToday();
@@ -325,6 +326,13 @@ export function Dashboard() {
   const completedToday = todos.filter((todo) => todo.completed && (!todo.date || todo.date === today)).length;
   const openTodos = todos.filter((todo) => !todo.completed);
   const focusTitle = openTodos[0]?.title ?? "Deep work on the next priority";
+  const [showFinancialForm, setShowFinancialForm] = useState(false);
+  const [newMilestone, setNewMilestone] = useState({
+    title: "",
+    target: "",
+    status: "Planned" as FinancialMilestone["status"],
+    notes: "",
+  });
 
   const financialCounts = useMemo(() => ({
     done: financialMilestones.filter((milestone) => milestone.status === "Done").length,
@@ -338,6 +346,20 @@ export function Dashboard() {
 
   const addTodo = (title: string, category: TodoItem["category"]) => {
     setTodos([...todos, { id: `todo-${Date.now()}`, title, completed: false, date: today, category }]);
+  };
+
+  const addFinancialMilestone = () => {
+    if (!newMilestone.title.trim()) return;
+    setFinancialMilestones([
+      { ...newMilestone, id: crypto.randomUUID(), title: newMilestone.title.trim(), target: newMilestone.target.trim() || "TBD" },
+      ...financialMilestones,
+    ]);
+    setNewMilestone({ title: "", target: "", status: "Planned", notes: "" });
+    setShowFinancialForm(false);
+  };
+
+  const updateFinancialMilestone = (id: string, patch: Partial<FinancialMilestone>) => {
+    setFinancialMilestones(financialMilestones.map(milestone => milestone.id === id ? { ...milestone, ...patch } : milestone));
   };
 
   const segments = [
@@ -420,10 +442,28 @@ export function Dashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-wider text-primary">
               <Coins className="size-4" /> Financial plan
-              <span className="ml-auto text-[10px] font-normal tracking-normal text-muted-foreground">milestone ledger</span>
+              <Button size="sm" variant="outline" className="ml-auto h-7 border-primary/40 text-primary" onClick={() => setShowFinancialForm(!showFinancialForm)}>
+                <Plus className="size-3 mr-1" /> Add
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {showFinancialForm && (
+              <div className="mb-4 space-y-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="grid gap-2 sm:grid-cols-[1fr_130px_120px]">
+                  <Input placeholder="Milestone title *" value={newMilestone.title} onChange={event => setNewMilestone({ ...newMilestone, title: event.target.value })} className="h-8 text-xs bg-background" />
+                  <Input placeholder="Target" value={newMilestone.target} onChange={event => setNewMilestone({ ...newMilestone, target: event.target.value })} className="h-8 text-xs bg-background" />
+                  <select value={newMilestone.status} onChange={event => setNewMilestone({ ...newMilestone, status: event.target.value as FinancialMilestone["status"] })} className="h-8 rounded-md border border-border bg-background px-2 text-xs">
+                    <option>Planned</option><option>In Progress</option><option>Done</option>
+                  </select>
+                </div>
+                <Input placeholder="Notes (optional)" value={newMilestone.notes} onChange={event => setNewMilestone({ ...newMilestone, notes: event.target.value })} className="h-8 text-xs bg-background" />
+                <div className="flex gap-2">
+                  <Button size="sm" className="h-8 bg-primary text-primary-foreground" onClick={addFinancialMilestone}><Check className="size-3 mr-1" /> Save</Button>
+                  <Button size="sm" variant="ghost" className="h-8" onClick={() => setShowFinancialForm(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
                 <p className="font-amiri text-2xl text-foreground">Fund the next chapter</p>
@@ -446,11 +486,17 @@ export function Dashboard() {
               ))}
             </div>
             <div className="space-y-2">
-              {financialMilestones.slice(0, 2).map((milestone) => (
-                <div key={milestone.id} className="flex items-center gap-3 border-t border-border/40 pt-2.5" data-testid={`financial-milestone-${milestone.id}`}>
-                  {milestone.status === "Done" ? <Check className="size-3.5 text-secondary" /> : <Circle className="size-3.5 text-primary" />}
-                  <span className="min-w-0 flex-1 truncate text-xs text-foreground">{milestone.title}</span>
-                  <span className="font-mono text-[9px] uppercase text-muted-foreground">{milestone.target}</span>
+              {financialMilestones.map((milestone) => (
+                <div key={milestone.id} className="space-y-1.5 border-t border-border/40 pt-2.5" data-testid={`financial-milestone-${milestone.id}`}>
+                  <div className="flex items-center gap-2">
+                    {milestone.status === "Done" ? <Check className="size-3.5 text-secondary" /> : <Circle className="size-3.5 text-primary" />}
+                    <Input value={milestone.title} onChange={event => updateFinancialMilestone(milestone.id, { title: event.target.value })} className="h-7 min-w-0 flex-1 border-transparent bg-transparent px-1 text-xs font-medium focus:border-border" aria-label="Milestone title" />
+                    <Input value={milestone.target} onChange={event => updateFinancialMilestone(milestone.id, { target: event.target.value })} className="h-7 w-28 border-transparent bg-transparent px-1 text-right font-mono text-[9px] uppercase focus:border-border" aria-label="Milestone target" />
+                    <select value={milestone.status} onChange={event => updateFinancialMilestone(milestone.id, { status: event.target.value as FinancialMilestone["status"] })} className="h-7 rounded-md border border-border/50 bg-background px-1 text-[9px]">
+                      <option>Planned</option><option>In Progress</option><option>Done</option>
+                    </select>
+                  </div>
+                  <Input value={milestone.notes} onChange={event => updateFinancialMilestone(milestone.id, { notes: event.target.value })} placeholder="Add notes..." className="ml-6 h-6 w-[calc(100%-1.5rem)] border-transparent bg-transparent px-1 text-[10px] text-muted-foreground focus:border-border" aria-label="Milestone notes" />
                 </div>
               ))}
               {!financialMilestones.length && <p className="text-xs text-muted-foreground">No financial milestones saved yet.</p>}

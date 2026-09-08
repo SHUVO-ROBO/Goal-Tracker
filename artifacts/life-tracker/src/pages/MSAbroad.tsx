@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { useAppStore, IELTSSegmentKey, IELTSSegmentData, MockTestEntry } from "@/hooks/use-app-store";
+import { useAppStore, IELTSSegmentKey, IELTSSegmentData, MockTestEntry, type DocumentChecklist, type VaultFile } from "@/hooks/use-app-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Globe, GraduationCap, FileText, Briefcase, Plus,
   CalendarDays, Info, Pencil, Check, X, ChevronDown, ChevronUp,
-  BookOpen, Mic, PenLine, Headphones, Trash2,
+  BookOpen, Mic, PenLine, Headphones, Trash2, ArrowDownToLine,
 } from "lucide-react";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -323,6 +323,7 @@ export function MSAbroad() {
     documents, setDocuments, scholarships, setScholarships,
     internships, setInternships, vocab, setVocab,
     ielts, setIelts, mockTests, setMockTests,
+    vaultFiles, setVaultFiles,
   } = useAppStore();
 
   const [newVocab, setNewVocab]         = useState("");
@@ -338,9 +339,13 @@ export function MSAbroad() {
   const [editingVocab, setEditingVocab] = useState<number | null>(null);
   const [vocabDraft, setVocabDraft] = useState("");
   const [vocabMessage, setVocabMessage] = useState("");
+  const [showDocumentForm, setShowDocumentForm] = useState(false);
+  const [newDocument, setNewDocument] = useState({ task: "", meta: "" });
+  const [vaultCategory, setVaultCategory] = useState<VaultFile["category"]>("Application");
+  const [vaultMessage, setVaultMessage] = useState("");
 
   const doneCount  = documents.filter(d => d.status === "Done").length;
-  const docProgress = Math.round((doneCount / documents.length) * 100);
+  const docProgress = documents.length ? Math.round((doneCount / documents.length) * 100) : 0;
 
   const updateSegment = (key: IELTSSegmentKey, patch: Partial<typeof ielts[typeof key]>) => {
     setIelts({ ...ielts, [key]: { ...ielts[key], ...patch } });
@@ -410,6 +415,53 @@ export function MSAbroad() {
     setVocab(vocab.map((entry, i) => i === index ? { ...entry, word: vocabDraft.trim() } : entry));
     setEditingVocab(null);
     setVocabMessage("");
+  };
+
+  const addDocument = () => {
+    if (!newDocument.task.trim()) return;
+    const document: DocumentChecklist = {
+      id: crypto.randomUUID(),
+      task: newDocument.task.trim(),
+      meta: newDocument.meta.trim() || undefined,
+      status: "Not Started",
+    };
+    setDocuments([document, ...documents]);
+    setNewDocument({ task: "", meta: "" });
+    setShowDocumentForm(false);
+  };
+
+  const handleVaultFiles = (files: FileList | null) => {
+    if (!files?.length) return;
+    const maxBytes = 4 * 1024 * 1024;
+    const accepted = Array.from(files).filter(file => file.size <= maxBytes);
+    const skipped = files.length - accepted.length;
+    if (skipped) {
+      setVaultMessage(`${skipped} file${skipped === 1 ? "" : "s"} skipped because the local vault limit is 4 MB per file.`);
+    } else {
+      setVaultMessage("");
+    }
+    accepted.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result !== "string") return;
+        setVaultFiles(current => [{
+          id: crypto.randomUUID(),
+          name: file.name,
+          contentType: file.type || "application/octet-stream",
+          size: file.size,
+          category: vaultCategory,
+          dataUrl: reader.result as string,
+          createdAt: new Date().toISOString(),
+        }, ...current]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const allCountries = ["All", ...Array.from(new Set(scholarships.map(s => s.country)))];
@@ -568,12 +620,33 @@ export function MSAbroad() {
                             </button>
                           </td>
                         </tr>
-                        {expandedSchol === schol.id && schol.notes && (
+                        {expandedSchol === schol.id && (
                           <tr className="border-b border-border/20 bg-primary/5">
                             <td colSpan={7} className="px-4 py-2.5">
-                              <div className="flex items-start gap-2 text-xs text-muted-foreground font-mono">
-                                <Info className="size-3 mt-0.5 text-primary shrink-0" />
-                                {schol.notes}
+                              <div className="grid gap-2 sm:grid-cols-2" onClick={e => e.stopPropagation()}>
+                                <Input
+                                  value={schol.name}
+                                  onChange={e => setScholarships(scholarships.map(candidate => candidate.id === schol.id ? { ...candidate, name: e.target.value } : candidate))}
+                                  className="h-8 bg-background text-xs"
+                                  aria-label="Scholarship program name"
+                                />
+                                <Input
+                                  value={schol.country}
+                                  onChange={e => setScholarships(scholarships.map(candidate => candidate.id === schol.id ? { ...candidate, country: e.target.value } : candidate))}
+                                  className="h-8 bg-background text-xs"
+                                  aria-label="Scholarship country"
+                                />
+                                <Input
+                                  value={schol.notes ?? ""}
+                                  onChange={e => setScholarships(scholarships.map(candidate => candidate.id === schol.id ? { ...candidate, notes: e.target.value } : candidate))}
+                                  placeholder="Requirements, fit, advisor or application notes..."
+                                  className="h-8 bg-background text-xs sm:col-span-2"
+                                  aria-label="Scholarship notes"
+                                />
+                                <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono sm:col-span-2">
+                                  <Info className="size-3 text-primary shrink-0" />
+                                  Expanded fields save automatically. Use the row controls for deadline, requirements and status.
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -596,11 +669,24 @@ export function MSAbroad() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-mono text-sm uppercase text-primary">Master Document Checklist</CardTitle>
-                <span className="font-mono text-xs text-muted-foreground">{doneCount}/{documents.length} Done</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs text-muted-foreground">{doneCount}/{documents.length} Done</span>
+                  <Button size="sm" variant="outline" className="h-7 border-primary/40 text-primary" onClick={() => setShowDocumentForm(!showDocumentForm)}>
+                    <Plus className="size-3 mr-1" /> Add
+                  </Button>
+                </div>
               </div>
               <Progress value={docProgress} className="h-1.5 mt-2 bg-muted" />
             </CardHeader>
             <CardContent>
+              {showDocumentForm && (
+                <div className="mb-4 flex flex-wrap gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                  <Input placeholder="Document task *" value={newDocument.task} onChange={e => setNewDocument({ ...newDocument, task: e.target.value })} className="h-8 flex-1 min-w-48 text-xs bg-background" />
+                  <Input placeholder="Short note / requirement" value={newDocument.meta} onChange={e => setNewDocument({ ...newDocument, meta: e.target.value })} className="h-8 flex-1 min-w-48 text-xs bg-background" />
+                  <Button size="sm" className="h-8 bg-primary text-primary-foreground" onClick={addDocument}><Check className="size-3 mr-1" /> Save</Button>
+                  <Button size="sm" variant="ghost" className="h-8" onClick={() => setShowDocumentForm(false)}>Cancel</Button>
+                </div>
+              )}
               <div className="space-y-2">
                 {documents.map(doc => (
                   <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background/40 hover:bg-card/50 transition-colors">
@@ -610,20 +696,67 @@ export function MSAbroad() {
                       </div>
                       {doc.meta && <div className="text-[11px] text-muted-foreground font-mono mt-0.5">{doc.meta}</div>}
                     </div>
-                    <Select value={doc.status} onValueChange={v => setDocuments(documents.map(d => d.id === doc.id ? { ...d, status: v as any } : d))}>
-                      <SelectTrigger className={`w-[130px] h-8 text-xs font-mono border ${
+                    <div className="flex items-center gap-2">
+                      <Select value={doc.status} onValueChange={v => setDocuments(documents.map(d => d.id === doc.id ? { ...d, status: v as any } : d))}>
+                        <SelectTrigger className={`w-[130px] h-8 text-xs font-mono border ${
                         doc.status === "Done"        ? "text-secondary border-secondary/30 bg-secondary/10" :
                         doc.status === "In Progress" ? "text-primary border-primary/30 bg-primary/10" : "border-border"
-                      }`}><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Not Started">Not Started</SelectItem>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Done">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        }`}><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Not Started">Not Started</SelectItem>
+                          <SelectItem value="In Progress">In Progress</SelectItem>
+                          <SelectItem value="Done">Done</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <button onClick={() => setDocuments(documents.filter(d => d.id !== doc.id))} className="p-1 text-muted-foreground/30 hover:text-destructive" title="Remove checklist item"><Trash2 className="size-3" /></button>
+                    </div>
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 border-border islamic-card">
+            <CardHeader className="pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="font-mono text-sm uppercase text-secondary">Private document vault</CardTitle>
+                  <p className="mt-1 text-[11px] text-muted-foreground">Local browser vault for PDFs, certificates, Word files and research notes.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select value={vaultCategory} onValueChange={value => setVaultCategory(value as VaultFile["category"])}>
+                    <SelectTrigger className="h-8 w-36 text-xs bg-background"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {(["Application", "Certificate", "Transcript", "Research", "Course note", "Other"] as VaultFile["category"][]).map(category => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <label className="inline-flex h-8 cursor-pointer items-center rounded-md bg-secondary px-3 text-xs font-medium text-secondary-foreground hover:bg-secondary/90">
+                    <Plus className="size-3 mr-1" /> Upload
+                    <input type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" className="sr-only" onChange={e => { handleVaultFiles(e.target.files); e.currentTarget.value = ""; }} />
+                  </label>
+                </div>
+              </div>
+              {vaultMessage && <p className="mt-2 text-[11px] text-warning">{vaultMessage}</p>}
+            </CardHeader>
+            <CardContent>
+              {vaultFiles.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/50 py-8 text-center text-xs text-muted-foreground">No files stored yet. Upload a document to keep a local copy beside your checklist.</div>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {vaultFiles.map(file => (
+                    <div key={file.id} className="flex items-center gap-3 rounded-lg border border-border/40 bg-background/40 p-3">
+                      <FileText className="size-4 shrink-0 text-secondary" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium">{file.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{file.category} · {formatFileSize(file.size)}</p>
+                      </div>
+                      <a href={file.dataUrl} download={file.name} className="text-secondary hover:text-secondary/80" title="Download file"><ArrowDownToLine className="size-3.5" /></a>
+                      <button onClick={() => setVaultFiles(vaultFiles.filter(candidate => candidate.id !== file.id))} className="text-muted-foreground/40 hover:text-destructive" title="Delete file"><Trash2 className="size-3.5" /></button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-[10px] text-muted-foreground">This static GitHub Pages build stores files only in this browser (4 MB per file). Cross-device secure storage requires the planned authenticated backend.</p>
             </CardContent>
           </Card>
         </TabsContent>
