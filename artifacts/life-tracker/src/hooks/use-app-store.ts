@@ -329,6 +329,24 @@ export const INITIAL_INTERNSHIPS: Internship[] = [
   { id:"5", name:"NASA Internship",                           deadline:"2028-11-01", status:"Not Applied", notes:"" },
 ];
 
+export type EcaCertification = {
+  id: string;
+  title: string;
+  url: string;
+  target: string;
+  status: "Not Started" | "In Progress" | "Completed";
+};
+
+export const INITIAL_ECA_CERTIFICATIONS: EcaCertification[] = [
+  { id:"google-developer", title:"Google Developer Certifications", url:"https://developers.google.com/certification", target:"Rolling", status:"Not Started" },
+  { id:"paypal-pci", title:"PayPal Technical Compliance (PCI DSS)", url:"https://www.paypal.com/in/webapps/mpp/pci-compliance", target:"Review by 2027", status:"Not Started" },
+  { id:"deloitte-academy", title:"Deloitte Academy", url:"https://www.deloitte.com/cy/en/services/deloitte-academy.html", target:"Rolling", status:"Not Started" },
+  { id:"oracle", title:"Oracle Certifications", url:"https://academy.oracle.com/en/resources-oracle-certifications.html", target:"Target: 2027", status:"Not Started" },
+  { id:"ibm-pearson-vue", title:"IBM Certifications (Pearson VUE)", url:"https://www.pearsonvue.com/us/en/ibm.html", target:"Target: 2027", status:"Not Started" },
+  { id:"meta", title:"Meta Certifications", url:"https://www.facebook.com/business/learn/certification", target:"Target: 2027", status:"Not Started" },
+  { id:"microsoft-python-cloud", title:"Microsoft Learn (Python & Cloud)", url:"https://learn.microsoft.com/en-us/shows/intro-to-python-development/", target:"Rolling", status:"Not Started" },
+];
+
 export type DistractionLog = {
   academics: number; ai: number; research: number; quran: number;
   ielts: number; familyBuffer: number; waste: number;
@@ -356,6 +374,7 @@ export function useAppStore() {
   const [vaultFiles, setVaultFiles]               = useLocalStorage<VaultFile[]>        ("life_tracker_vault_files",          []);
   const [scholarships, setScholarships]         = useLocalStorage<Scholarship[]>       ("life_tracker_scholarships",       INITIAL_SCHOLARSHIPS);
   const [internships, setInternships]           = useLocalStorage<Internship[]>        ("life_tracker_internships",        INITIAL_INTERNSHIPS);
+  const [ecaCertifications, setEcaCertifications] = useLocalStorage<EcaCertification[]>("life_tracker_eca_certifications", INITIAL_ECA_CERTIFICATIONS);
   const [certificates, setCertificates]         = useLocalStorage<Certificate[]>       ("life_tracker_certificates",       INITIAL_CERTIFICATES);
   const [ielts, setIelts]                       = useLocalStorage<IELTSData>           ("life_tracker_ielts",              INITIAL_IELTS);
   const [mockTests, setMockTests]               = useLocalStorage<MockTestEntry[]>     ("life_tracker_mock_tests",         []);
@@ -378,6 +397,7 @@ export function useAppStore() {
     vaultFiles, setVaultFiles,
     scholarships, setScholarships,
     internships, setInternships,
+    ecaCertifications, setEcaCertifications,
     certificates, setCertificates,
     ielts, setIelts,
     mockTests, setMockTests,

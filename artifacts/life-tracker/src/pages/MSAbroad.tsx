@@ -322,6 +322,7 @@ export function MSAbroad() {
   const {
     documents, setDocuments, scholarships, setScholarships,
     internships, setInternships, vocab, setVocab,
+    ecaCertifications, setEcaCertifications,
     ielts, setIelts, mockTests, setMockTests,
     vaultFiles, setVaultFiles,
   } = useAppStore();
@@ -907,11 +908,14 @@ export function MSAbroad() {
 
         {/* ══ ECA ══════════════════════════════════════════════════════════ */}
         <TabsContent value="internships" className="space-y-4 m-0">
-           <Card className="bg-card/60 border-border islamic-card">
-             <CardHeader className="flex flex-row items-center justify-between">
-               <CardTitle className="font-mono text-sm uppercase text-warning">ECA & Community Roles</CardTitle>
-               <Button size="sm" variant="outline" className="h-8 border-warning/40 text-warning" onClick={() => setShowEcaForm(!showEcaForm)}><Plus className="size-3 mr-1" /> Add role</Button>
-             </CardHeader>
+          <Card className="bg-card/60 border-border islamic-card">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-mono text-sm uppercase text-warning">Community Roles & Internships</CardTitle>
+                <p className="mt-1 text-[11px] text-muted-foreground">Leadership, community, and practical experience targets.</p>
+              </div>
+              <Button size="sm" variant="outline" className="h-8 border-warning/40 text-warning" onClick={() => setShowEcaForm(!showEcaForm)}><Plus className="size-3 mr-1" /> Add role</Button>
+            </CardHeader>
             <CardContent>
                {showEcaForm && (
                  <div className="mb-4 grid gap-2 rounded-xl border border-warning/25 bg-warning/5 p-3 sm:grid-cols-3">
@@ -951,6 +955,53 @@ export function MSAbroad() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 border-border islamic-card">
+            <CardHeader>
+              <CardTitle className="font-mono text-sm uppercase text-secondary">Global Professional Certifications</CardTitle>
+              <p className="mt-1 text-[11px] text-muted-foreground">Direct links to certification and professional learning pathways.</p>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {ecaCertifications.map(cert => (
+                <div key={cert.id} className="rounded-lg border border-border/40 bg-background/40 p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
+                    <div className="font-medium text-foreground text-sm">{cert.title}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="text-[10px] font-mono text-secondary border-secondary/30">
+                        Target / deadline: {cert.target}
+                      </Badge>
+                      <a
+                        href={cert.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-md border border-secondary/40 px-2 py-1 text-[10px] font-mono uppercase tracking-wide text-secondary transition-colors hover:bg-secondary/10"
+                      >
+                        Open certification link
+                      </a>
+                    </div>
+                  </div>
+                  <Select
+                    value={cert.status}
+                    onValueChange={value => setEcaCertifications(ecaCertifications.map(item =>
+                      item.id === cert.id ? { ...item, status: value as typeof cert.status } : item
+                    ))}
+                  >
+                    <SelectTrigger className={`w-full lg:w-[140px] h-8 text-xs font-mono border ${
+                      cert.status === "Completed" ? "text-secondary border-secondary/30 bg-secondary/10" :
+                      cert.status === "In Progress" ? "text-primary border-primary/30 bg-primary/10" : "border-border"
+                    }`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Not Started">Not Started</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </TabsContent>
