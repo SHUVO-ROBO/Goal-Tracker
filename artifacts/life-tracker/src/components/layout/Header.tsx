@@ -1,11 +1,12 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import { useAppStore } from "@/hooks/use-app-store";
 
 const QUOTE = "Building scalable AI systems — one focused day at a time. لَا تَيْأَسُوا مِنْ رَوْحِ اللَّهِ";
 
-// Days until graduation (approx 26 months → Aug 2028)
-const GRAD_DATE = new Date("2028-08-01");
+// Graduation is targeted for October 2028; use the last day as the countdown target.
+const GRAD_DATE = new Date(2028, 9, 31, 23, 59, 59);
 
 function getDaysUntil(target: Date): number {
   return Math.max(0, Math.ceil((target.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
@@ -13,6 +14,7 @@ function getDaysUntil(target: Date): number {
 
 export function Header() {
   const [time, setTime] = useState(new Date());
+  const { courses } = useAppStore();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -20,6 +22,10 @@ export function Header() {
   }, []);
 
   const daysLeft = getDaysUntil(GRAD_DATE);
+  const completedCourses = courses.filter(course => course.status === "completed");
+  const creditsDone = completedCourses.reduce((sum, course) => sum + course.credits, 0);
+  const gradePoints = completedCourses.reduce((sum, course) => sum + course.credits * course.gpa, 0);
+  const currentCgpa = creditsDone ? (gradePoints / creditsDone).toFixed(2) : "0.00";
   const prayerTimes = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
   return (
@@ -71,7 +77,9 @@ export function Header() {
           <div className="flex flex-wrap gap-4 sm:gap-8">
             {[
               { label: "Trimesters Left", value: "7" },
-              { label: "Credits Done / Total", value: "51 / 138" },
+              { label: "Current CGPA", value: currentCgpa },
+              { label: "Credits Done / Total", value: `${creditsDone} / 138` },
+              { label: "Target Graduation", value: "October 2028" },
               { label: "Days to Graduation", value: daysLeft.toLocaleString() },
               { label: "Target CGPA", value: "3.99+" },
             ].map(({ label, value }) => (

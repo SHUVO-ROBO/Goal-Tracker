@@ -67,6 +67,8 @@ export type TodoItem = {
   category: "Academic" | "AI/ML" | "IELTS" | "Spiritual" | "Personal";
 };
 
+export type DailyRoutineChecks = Record<string, Record<string, boolean>>;
+
 export type FinancialMilestone = {
   id: string;
   title: string;
@@ -382,6 +384,7 @@ export function useAppStore() {
   const [cambridgeTests, setCambridgeTests]     = useLocalStorage<number>              ("life_tracker_cambridge_tests",    0);
   const [spiritualLogs, setSpiritualLogs]       = useLocalStorage<Record<string, DailyQuranRecord>>("life_tracker_spiritual", {});
   const [todos, setTodos]                       = useLocalStorage<TodoItem[]>           ("life_tracker_todos",            INITIAL_TODOS);
+  const [dailyRoutineChecks, setDailyRoutineChecks] = useLocalStorage<DailyRoutineChecks>("life_tracker_daily_routines", {});
   const [financialMilestones, setFinancialMilestones] = useLocalStorage<FinancialMilestone[]>("life_tracker_financial", INITIAL_FINANCIAL_MILESTONES);
 
   return {
@@ -405,6 +408,7 @@ export function useAppStore() {
     cambridgeTests, setCambridgeTests,
     spiritualLogs, setSpiritualLogs,
     todos, setTodos,
+    dailyRoutineChecks, setDailyRoutineChecks,
     financialMilestones, setFinancialMilestones,
   };
 }

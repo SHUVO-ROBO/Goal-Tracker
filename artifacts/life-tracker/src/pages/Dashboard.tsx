@@ -27,6 +27,9 @@ import {
   TimerReset,
   TrendingUp,
   UsersRound,
+  Pencil,
+  Trash2,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
@@ -155,15 +158,23 @@ function AlertIcon() {
 
 function TodoPanel({
   todos,
+  today,
   onToggle,
   onAdd,
+  onEdit,
+  onDelete,
 }: {
   todos: TodoItem[];
+  today: string;
   onToggle: (id: string) => void;
   onAdd: (title: string, category: TodoItem["category"]) => void;
+  onEdit: (id: string, patch: Pick<TodoItem, "title" | "category">) => void;
+  onDelete: (id: string) => void;
 }) {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<TodoItem["category"]>("Academic");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState({ title: "", category: "Academic" as TodoItem["category"] });
 
   const submitTodo = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -173,8 +184,9 @@ function TodoPanel({
     setTitle("");
   };
 
-  const incompleteTodos = todos.filter((todo) => !todo.completed);
-  const visibleTodos = todos.slice(0, 5);
+  const visibleTodos = todos.filter((todo) => !todo.date || todo.date === today);
+  const incompleteTodos = visibleTodos.filter((todo) => !todo.completed);
+  const completedTodos = visibleTodos.filter((todo) => todo.completed).length;
 
   return (
     <Card className="islamic-card border-border/70 bg-card/65" data-testid="card-daily-todos">
@@ -185,7 +197,7 @@ function TodoPanel({
           </CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">{incompleteTodos.length} open {incompleteTodos.length === 1 ? "task" : "tasks"} in your local plan</p>
         </div>
-        <span className="font-mono text-xs text-secondary" data-testid="text-todo-completion">{todos.filter((todo) => todo.completed).length}/{todos.length}</span>
+        <span className="font-mono text-xs text-secondary" data-testid="text-todo-completion">{completedTodos}/{visibleTodos.length}</span>
       </CardHeader>
       <CardContent className="space-y-4">
         <form className="flex gap-2" onSubmit={submitTodo}>
@@ -202,7 +214,7 @@ function TodoPanel({
             data-testid="select-todo-category"
             value={category}
             onChange={(event) => setCategory(event.target.value as TodoItem["category"])}
-            className="hidden h-9 rounded-md border border-input bg-background/40 px-2 text-xs text-foreground sm:block"
+            className="h-9 max-w-28 rounded-md border border-input bg-background/40 px-2 text-xs text-foreground"
           >
             {["Academic", "AI/ML", "IELTS", "Spiritual", "Personal"].map((item) => <option key={item}>{item}</option>)}
           </select>
@@ -210,18 +222,76 @@ function TodoPanel({
             <Plus />
           </Button>
         </form>
-        <div className="space-y-1.5">
+        <div className="max-h-96 space-y-1.5 overflow-y-auto pr-1">
           {visibleTodos.length ? visibleTodos.map((todo) => (
-            <label key={todo.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-2 py-2 transition-colors hover:border-primary/20 hover:bg-primary/5" data-testid={`row-todo-${todo.id}`}>
-              <Checkbox
-                checked={todo.completed}
-                onCheckedChange={() => onToggle(todo.id)}
-                aria-label={`Mark ${todo.title} complete`}
-                data-testid={`checkbox-todo-${todo.id}`}
-              />
-              <span className={`min-w-0 flex-1 text-sm ${todo.completed ? "text-muted-foreground line-through" : "text-foreground"}`}>{todo.title}</span>
-              <span className="rounded border border-border/70 px-1.5 py-0.5 font-mono text-[9px] uppercase text-muted-foreground">{todo.category}</span>
-            </label>
+            <div key={todo.id} className="rounded-lg border border-transparent px-2 py-2 transition-colors hover:border-primary/20 hover:bg-primary/5" data-testid={`row-todo-${todo.id}`}>
+              {editingId === todo.id ? (
+                <form
+                  className="flex flex-wrap items-center gap-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const nextTitle = editDraft.title.trim();
+                    if (!nextTitle) return;
+                    onEdit(todo.id, { title: nextTitle, category: editDraft.category });
+                    setEditingId(null);
+                  }}
+                >
+                  <Input
+                    autoFocus
+                    aria-label="Edit task"
+                    value={editDraft.title}
+                    onChange={event => setEditDraft({ ...editDraft, title: event.target.value })}
+                    className="h-8 min-w-36 flex-1 bg-background text-sm"
+                  />
+                  <select
+                    aria-label="Edit task category"
+                    value={editDraft.category}
+                    onChange={event => setEditDraft({ ...editDraft, category: event.target.value as TodoItem["category"] })}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground"
+                  >
+                    {["Academic", "AI/ML", "IELTS", "Spiritual", "Personal"].map(item => <option key={item}>{item}</option>)}
+                  </select>
+                  <Button type="submit" size="icon" variant="outline" className="size-8" aria-label="Save task edit"><Check className="size-4" /></Button>
+                  <Button type="button" size="icon" variant="ghost" className="size-8" aria-label="Cancel task edit" onClick={() => setEditingId(null)}><X className="size-4" /></Button>
+                </form>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
+                    <Checkbox
+                      checked={todo.completed}
+                      onCheckedChange={() => onToggle(todo.id)}
+                      aria-label={`Mark ${todo.title} complete`}
+                      data-testid={`checkbox-todo-${todo.id}`}
+                    />
+                    <span className={`min-w-0 flex-1 text-sm ${todo.completed ? "text-muted-foreground line-through" : "text-foreground"}`}>{todo.title}</span>
+                  </label>
+                  <span className="rounded border border-border/70 px-1.5 py-0.5 font-mono text-[9px] uppercase text-muted-foreground">{todo.category}</span>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="size-7 text-muted-foreground hover:text-primary"
+                    aria-label={`Edit ${todo.title}`}
+                    onClick={() => {
+                      setEditingId(todo.id);
+                      setEditDraft({ title: todo.title, category: todo.category });
+                    }}
+                  >
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="size-7 text-muted-foreground hover:text-destructive"
+                    aria-label={`Delete ${todo.title}`}
+                    onClick={() => onDelete(todo.id)}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                </div>
+              )}
+            </div>
           )) : (
             <div className="rounded-lg border border-dashed border-primary/25 bg-primary/5 p-4 text-center text-xs text-muted-foreground">Your command list is clear. Add the next meaningful step.</div>
           )}
@@ -345,7 +415,15 @@ export function Dashboard() {
   };
 
   const addTodo = (title: string, category: TodoItem["category"]) => {
-    setTodos([...todos, { id: `todo-${Date.now()}`, title, completed: false, date: today, category }]);
+    setTodos([...todos, { id: crypto.randomUUID(), title, completed: false, date: today, category }]);
+  };
+
+  const editTodo = (id: string, patch: Pick<TodoItem, "title" | "category">) => {
+    setTodos(todos.map(todo => todo.id === id ? { ...todo, ...patch } : todo));
+  };
+
+  const deleteTodo = (id: string) => {
+    setTodos(todos.filter(todo => todo.id !== id));
   };
 
   const addFinancialMilestone = () => {
@@ -409,7 +487,7 @@ export function Dashboard() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-        <TodoPanel todos={todos} onToggle={toggleTodo} onAdd={addTodo} />
+        <TodoPanel todos={todos} today={today} onToggle={toggleTodo} onAdd={addTodo} onEdit={editTodo} onDelete={deleteTodo} />
         <FocusPanel focusTitle={focusTitle} />
       </section>
 

@@ -4,17 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { DistractionFirewall } from "./Dashboard";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 type BlockType = "spiritual" | "deep_work" | "academic" | "skill" | "review" | "buffer" | "sleep";
 
-const TIME_BLOCKS: { start: string; end: string; label: string; type: BlockType; startHr: number; endHr: number }[] = [
-  { start: "04:30", end: "06:30", label: "Spiritual & Vision Start (Quran & Planning)", type: "spiritual", startHr: 4.5, endHr: 6.5 },
-  { start: "06:30", end: "08:30", label: "Deep Work (AI/ML & GitHub)", type: "deep_work", startHr: 6.5, endHr: 8.5 },
-  { start: "09:00", end: "16:00", label: "Academic Core (UIU Classes, Labs)", type: "academic", startHr: 9, endHr: 16 },
-  { start: "16:30", end: "18:30", label: "High-Paying Skill / Active Earning", type: "skill", startHr: 16.5, endHr: 18.5 },
-  { start: "19:30", end: "21:30", label: "Academic Review & Assignments", type: "review", startHr: 19.5, endHr: 21.5 },
-  { start: "21:30", end: "22:30", label: "Isolated Buffer (Family concerns - banned outside)", type: "buffer", startHr: 21.5, endHr: 22.5 },
-  { start: "22:30", end: "04:30", label: "Sleep / Rest", type: "sleep", startHr: 22.5, endHr: 28.5 }, // 28.5 = 4.5 next day
+const TIME_BLOCKS: { id: string; start: string; end: string; label: string; type: BlockType; startHr: number; endHr: number; trackable: boolean }[] = [
+  { id: "spiritual", start: "04:30", end: "06:30", label: "Spiritual & Vision Start (Quran Tafsir & Planning)", type: "spiritual", startHr: 4.5, endHr: 6.5, trackable: true },
+  { id: "deep-work", start: "06:30", end: "08:30", label: "Deep Work (AI/ML Engineering & Code Push)", type: "deep_work", startHr: 6.5, endHr: 8.5, trackable: true },
+  { id: "academic", start: "09:00", end: "16:00", label: "Academic Core (UIU Classes, Labs & Faculty Networking)", type: "academic", startHr: 9, endHr: 16, trackable: true },
+  { id: "skill", start: "16:30", end: "18:30", label: "High-Paying Skill / Active Earning / Tuitions", type: "skill", startHr: 16.5, endHr: 18.5, trackable: true },
+  { id: "review", start: "19:30", end: "21:30", label: "Academic Review & Assignments", type: "review", startHr: 19.5, endHr: 21.5, trackable: true },
+  { id: "buffer", start: "21:30", end: "22:30", label: "Isolated Buffer Time (Debt & Family Anxiety)", type: "buffer", startHr: 21.5, endHr: 22.5, trackable: true },
+  { id: "sleep", start: "22:30", end: "04:30", label: "Sleep / Rest", type: "sleep", startHr: 22.5, endHr: 28.5, trackable: false }, // 28.5 = 4.5 next day
 ];
 
 const BLOCK_COLORS: Record<BlockType, string> = {
@@ -27,9 +29,27 @@ const BLOCK_COLORS: Record<BlockType, string> = {
   sleep: "hsl(0 0% 30%)", // Dark Gray
 };
 
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function TimeManagement() {
-  const { distractionLog, setDistractionLog } = useAppStore();
+  const { distractionLog, setDistractionLog, dailyRoutineChecks, setDailyRoutineChecks } = useAppStore();
   const [currentHour, setCurrentHour] = useState<number>(0);
+  const today = getLocalDateKey();
+  const todayChecks = dailyRoutineChecks[today] ?? {};
+  const routineCount = TIME_BLOCKS.filter(block => block.trackable).length;
+  const routinesDone = TIME_BLOCKS.filter(block => block.trackable && todayChecks[block.id]).length;
+
+  const toggleRoutine = (id: string, checked: boolean) => {
+    setDailyRoutineChecks({
+      ...dailyRoutineChecks,
+      [today]: { ...todayChecks, [id]: checked },
+    });
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -56,46 +76,67 @@ export function TimeManagement() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       
-      {/* 24-Hour Time Block Widget */}
+      {/* Daily schedule and routine checklist */}
       <Card className="bg-card/50 border-border">
         <CardHeader>
-          <CardTitle className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
-            24-Hour Operations Timeline
-          </CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <CardTitle className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Daily Time-Blocking Schedule
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">04:30 AM – 10:30 PM · Check off each block as you complete it.</p>
+            </div>
+            <Badge variant="outline" className="border-primary/30 font-mono text-primary" data-testid="text-routine-progress">
+              {routinesDone}/{routineCount} blocks complete today
+            </Badge>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {TIME_BLOCKS.map((block, idx) => {
+            {TIME_BLOCKS.map((block) => {
               let isCurrent = false;
               if (block.type === 'sleep') {
                 isCurrent = currentHour >= 22.5 && currentHour < 28.5;
               } else {
                 isCurrent = currentHour >= block.startHr && currentHour < block.endHr;
               }
+              const isDone = Boolean(todayChecks[block.id]);
 
               return (
                 <div 
-                  key={idx} 
-                  className={`flex items-center gap-4 p-3 rounded-md border transition-all ${
-                    isCurrent ? 'bg-card border-border shadow-lg scale-[1.02]' : 'bg-background/50 border-transparent opacity-60'
+                  key={block.id}
+                  className={`flex items-center gap-2 p-3 rounded-md border transition-all sm:gap-4 ${
+                    isCurrent ? 'bg-card border-border shadow-lg' : 'bg-background/50 border-transparent'
                   }`}
                   style={{
                     boxShadow: isCurrent ? `0 0 15px ${BLOCK_COLORS[block.type]}40` : 'none',
-                    borderColor: isCurrent ? BLOCK_COLORS[block.type] : 'transparent'
+                    borderColor: isCurrent ? BLOCK_COLORS[block.type] : undefined,
+                    opacity: isDone ? 0.65 : undefined,
                   }}
                 >
-                  <div className="w-24 shrink-0 font-mono text-xs text-muted-foreground font-medium">
+                  <div className="w-28 shrink-0 font-mono text-[11px] text-muted-foreground font-medium">
                     {block.start} - {block.end}
                   </div>
                   <div 
                     className="w-3 h-3 rounded-full shrink-0"
                     style={{ backgroundColor: BLOCK_COLORS[block.type], boxShadow: isCurrent ? `0 0 8px ${BLOCK_COLORS[block.type]}` : 'none' }}
                   />
-                  <div className={`font-mono text-sm truncate ${isCurrent ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>
+                  <div className={`min-w-0 flex-1 font-mono text-sm ${isDone ? "text-muted-foreground line-through" : isCurrent ? "text-foreground font-bold" : "text-muted-foreground"}`}>
                     {block.label}
                   </div>
+                  {block.trackable && (
+                    <label className="ml-auto flex shrink-0 cursor-pointer items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                      <span className="hidden sm:inline">{isDone ? "Done" : "Mark done"}</span>
+                      <Checkbox
+                        checked={isDone}
+                        onCheckedChange={checked => toggleRoutine(block.id, checked === true)}
+                        aria-label={`${isDone ? "Uncheck" : "Complete"} ${block.label}`}
+                        data-testid={`checkbox-routine-${block.id}`}
+                      />
+                    </label>
+                  )}
                   {isCurrent && (
-                    <div className="ml-auto flex items-center gap-2 text-xs font-mono tracking-widest uppercase animate-pulse" style={{ color: BLOCK_COLORS[block.type] }}>
+                    <div className="hidden shrink-0 items-center gap-2 text-[10px] font-mono tracking-widest uppercase animate-pulse sm:flex" style={{ color: BLOCK_COLORS[block.type] }}>
                       Active
                     </div>
                   )}
