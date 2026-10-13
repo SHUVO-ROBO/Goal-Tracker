@@ -1,3 +1,73 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>Shuvo's cybernetic S compass</title>
+  <defs>
+    <linearGradient id="shell" x1="15" y1="9" x2="111" y2="119" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#172431"/>
+      <stop offset=".52" stop-color="#090f18"/>
+      <stop offset="1" stop-color="#050910"/>
+    </linearGradient>
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientTransform="translate(64 59) rotate(90) scale(55)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#142832"/>
+      <stop offset="1" stop-color="#101621" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="34" y1="28" x2="94" y2="102" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff3bd"/>
+      <stop offset=".2" stop-color="#d9b661"/>
+      <stop offset=".48" stop-color="#fff0ad"/>
+      <stop offset=".74" stop-color="#ad7726"/>
+      <stop offset="1" stop-color="#f2d47e"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="27" y1="24" x2="103" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b0fff8"/>
+      <stop offset=".43" stop-color="#39eadf"/>
+      <stop offset="1" stop-color="#078dba"/>
+    </linearGradient>
+    <filter id="cyanGlow" x="5" y="5" width="118" height="118" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="2.4"/>
+    </filter>
+    <filter id="goldGlow" x="21" y="16" width="86" height="96" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="2.6"/>
+    </filter>
+  </defs>
+
+  <rect x="3" y="3" width="122" height="122" rx="29" fill="#03070d"/>
+  <rect x="4.5" y="4.5" width="119" height="119" rx="27.5" fill="url(#shell)" stroke="#344757"/>
+  <rect x="5" y="5" width="118" height="118" rx="27" fill="url(#core)"/>
+
+  <g filter="url(#cyanGlow)" opacity=".34" stroke="#39eadf" stroke-linecap="round">
+    <circle cx="64" cy="64" r="47" stroke-width="2"/>
+    <path d="M64 9v10m0 90v10M9 64h10m90 0h10" stroke-width="3"/>
+  </g>
+  <circle cx="64" cy="64" r="47" stroke="url(#gold)" stroke-width="1.6" opacity=".9"/>
+  <circle cx="64" cy="64" r="42.5" stroke="#92a5a9" stroke-width=".55" stroke-dasharray="1 4" opacity=".55"/>
+
+  <g stroke-linecap="round">
+    <path d="M64 9v8m0 94v8M9 64h8m94 0h8" stroke="url(#gold)" stroke-width="1.8"/>
+    <path d="M26.3 26.3l5.1 5.1m65.2 65.2 5.1 5.1m0-75.4-5.1 5.1m-65.2 65.2-5.1 5.1" stroke="#8b9da4" stroke-width="1" opacity=".8"/>
+    <path d="M42 16.9l2.2 5.8m39.6 82.6 2.2 5.8M16.9 86l5.8-2.2m82.6-39.6 5.8-2.2" stroke="url(#cyan)" stroke-width="1.6"/>
+  </g>
+
+  <path d="M64 12.5 58.7 26l5.3-3.2 5.3 3.2L64 12.5Z" fill="url(#gold)" stroke="#fff1bb" stroke-width=".7" stroke-linejoin="round"/>
+  <path d="M64 115.5 68.1 105l-4.1 2.4-4.1-2.4 4.1 10.5Z" fill="#27c9d2" opacity=".9"/>
+
+  <g stroke="#34e6dd" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15.5 49h8l4-4h7" stroke-width="1.25" opacity=".9"/>
+    <path d="M15.5 79h7l4 4h8" stroke-width="1.25" opacity=".75"/>
+    <path d="M93.5 40h7l4-4h8" stroke-width="1.25" opacity=".8"/>
+    <path d="M93.5 88h7l4 4h8" stroke-width="1.25" opacity=".9"/>
+  </g>
+  <g fill="#a6fff7">
+    <circle cx="34.5" cy="45" r="1.5"/>
+    <circle cx="34.5" cy="83" r="1.5"/>
+    <circle cx="93.5" cy="40" r="1.5"/>
+    <circle cx="93.5" cy="88" r="1.5"/>
+  </g>
+
+  <path d="M84 37C78.8 31.6 70.7 29.8 61.5 31.5 49.5 33.7 41.6 40.3 42.7 49.3c.9 7.7 9.5 10.9 21.1 13.7 12.6 3.1 21.4 6.1 21.4 16.1 0 10.1-9.5 17-22.2 17-10.2 0-18.9-3.9-23.4-10.5" stroke="#03070d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+  <path d="M84 37C78.8 31.6 70.7 29.8 61.5 31.5 49.5 33.7 41.6 40.3 42.7 49.3c.9 7.7 9.5 10.9 21.1 13.7 12.6 3.1 21.4 6.1 21.4 16.1 0 10.1-9.5 17-22.2 17-10.2 0-18.9-3.9-23.4-10.5" stroke="#d7aa45" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow)" opacity=".43"/>
+  <path d="M84 37C78.8 31.6 70.7 29.8 61.5 31.5 49.5 33.7 41.6 40.3 42.7 49.3c.9 7.7 9.5 10.9 21.1 13.7 12.6 3.1 21.4 6.1 21.4 16.1 0 10.1-9.5 17-22.2 17-10.2 0-18.9-3.9-23.4-10.5" stroke="url(#gold)" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80.9 35.4c-5-3.7-11.8-4.6-18.8-3.3-3.8.7-7.1 2-9.8 3.9" stroke="#fff7d9" stroke-width="1.3" stroke-linecap="round" opacity=".88"/>
+  <path d="M62 31.4c-.2-3.4.5-5.4 2-7.4m17.6 62.4c-2.4 4.4-7.8 7.4-14.4 8.1" stroke="url(#cyan)" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="3.3" fill="#0b1921" stroke="url(#cyan)" stroke-width="1.5"/>
+  <circle cx="64" cy="64" r="1.1" fill="#d9fff8"/>
 </svg>
